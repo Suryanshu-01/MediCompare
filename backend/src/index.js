@@ -1,8 +1,10 @@
-import dotenv from "dotenv";
-import { app } from "./app.js";
+import "dotenv/config";
+//aisa isliye kiye kyuki .env file baad main execute ho rha tha pehle app.js execute hoo rha tha
+console.log("DOTENV is loaded");
+console.log("DOTENV is loaded");
 import connectDB from "./config/db.js";
+import { app } from "./app.js";
 
-dotenv.config();
 const PORT = process.env.PORT || 8001;
 
 connectDB()

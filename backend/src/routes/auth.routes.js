@@ -6,7 +6,8 @@ import {
     login
 } from "../controllers/auth.controller.js";
 
-import "../middlewares/upload.middleware.js";
+import upload from "../middlewares/upload.middleware.js";
+
 
 const router= express.Router();
 
@@ -15,6 +16,6 @@ router.post("/register", registerUser);
 
 router.post("/login",login);
 
-//router.post("/hospital/register",upload.single("document"),registerHospital);
+router.post("/hospital/register",upload.single("document"),registerHospital,);
 
 export default router;

@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import Hospital from "../models/hospital.model.js";
+import uploadToCloudinary from "../utils/cloudinaryUpload.js";
 
 const registerUser = async (req, res) => {
   try {
@@ -24,12 +25,12 @@ const registerUser = async (req, res) => {
       phone,
       role: "USER",
     });
-    if(!user){
+    if (!user) {
       console.log("User not created");
       return res.status(402).json({
-        success:false,
-        message:"user not created"
-      })
+        success: false,
+        message: "user not created",
+      });
     }
 
     const token = user.generateJWT();
@@ -44,31 +45,43 @@ const registerUser = async (req, res) => {
         role: user.role,
       },
     });
-
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Internal Server error occur"});
+    return res.status(500).json({ message: "Internal Server error occur" });
   }
 };
 
 const registerHospital = async (req, res) => {
   try {
-    const { hospitalName, email, phone, address, longitude, latitude } =
-      req.body;
+    const {
+      hospitalName,
+      email,
+      password,
+      phone,
+      address,
+      longitude,
+      latitude,
+    } = req.body;
 
     if (
       !hospitalName ||
       !email ||
       !phone ||
+      !password ||
       !address ||
       !longitude ||
-      !latitude ||
-      !req.file
+      !latitude
     ) {
       return res.status(400).json({
         success: false,
         message: "Enter all the info",
       });
+    }
+    if(!req.file){
+      return res.status(400).json({
+        success:false,
+        message:"Hospital documents are required"
+      })
     }
 
     const existedHospital = await Hospital.findOne({ email });
@@ -77,19 +90,25 @@ const registerHospital = async (req, res) => {
       {
         return res.status(409).json({
           success: false,
-          message: "User already existed",
+          message: "Hospital already existed, waiting for admin verification",
         });
       }
     }
+
+    const {secure_url,public_Id}=await uploadToCloudinary(req.file.path,{
+      folder:"Medi-Compare/Hospital-Documents",
+    });
 
     const user = await User.create({
       name: hospitalName,
       email,
       password,
       phone,
+      role: "HOSPITAL",
     });
 
     await Hospital.create({
+      userId: user._id,
       name: hospitalName,
       email,
       phone,
@@ -100,17 +119,19 @@ const registerHospital = async (req, res) => {
         coordinates: [Number(longitude), Number(latitude)],
       },
       document: {
-        url: req.file.path,
-        publicId: req.file.filename,
+        url: secure_url,
+        publicId: public_Id,
+        uploadedAt: new Date()
       },
       status: "PENDING",
     });
-    return res.status(409).json({
-      success: false,
-      message: "User already existed",
+
+    return res.status(200).json({
+      success: true,
+      message: "Hospital request submitted, Wait for admin to verify"
     });
   } catch (error) {
-    console.log("Error Came");
+    console.log("Error Came", error);
     return res.status(500).json({
       success: false,
       message: "Server error occur",
@@ -177,8 +198,4 @@ const login = async (req, res) => {
   }
 };
 
-export {
-  login,
-  registerHospital,
-  registerUser,
-}
+export { login, registerHospital, registerUser };
