@@ -4,7 +4,7 @@ const verifiedHospital= async (req,res,next)=>{
     try {
         const {userId}=req.user;
 
-        const hospital=await Hospital.findById(userId);
+        const hospital=await Hospital.findOne({userId});
         if(!hospital){
             return res.status(404).json({
                 success:false,
@@ -19,7 +19,7 @@ const verifiedHospital= async (req,res,next)=>{
             })
         }
 
-        req.hospital=hospital;
+        req.hospitalId=hospital._id;
 
         next();
 

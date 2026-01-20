@@ -22,7 +22,7 @@ const doctorSchema= new Schema(
             publicId:String
         },
         qualification:{
-            type:String,
+            type:[String],
             required:true,
             trim:true,
         },

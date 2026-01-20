@@ -2,6 +2,9 @@ import User from "../models/user.model.js";
 import Hospital from "../models/hospital.model.js";
 import uploadToCloudinary from "../utils/cloudinaryUpload.js";
 //to register normal user
+
+
+
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, phone } = req.body;
@@ -32,7 +35,7 @@ const registerUser = async (req, res) => {
         message: "user not created",
       });
     }
-
+    
     const token = user.generateJWT();
     res.status(200).json({
       success: true,
@@ -62,7 +65,7 @@ const registerHospital = async (req, res) => {
       longitude,
       latitude,
     } = req.body;
-
+    
     if (
       !hospitalName ||
       !email ||
@@ -83,9 +86,9 @@ const registerHospital = async (req, res) => {
         message:"Hospital documents are required"
       })
     }
-
+    
     const existedHospital = await Hospital.findOne({ email });
-
+    
     if (existedHospital) {
       {
         return res.status(409).json({
@@ -94,11 +97,11 @@ const registerHospital = async (req, res) => {
         });
       }
     }
-
+    
     const {secure_url,public_Id}=await uploadToCloudinary(req.file.path,{
       folder:"Medi-Compare/Hospital-Documents",
     });
-
+    
     const user = await User.create({
       name: hospitalName,
       email,
@@ -106,14 +109,14 @@ const registerHospital = async (req, res) => {
       phone,
       role: "HOSPITAL",
     });
-
+    
     await Hospital.create({
       userId: user._id,
       name: hospitalName,
       email,
       phone,
       address,
-
+      
       location: {
         type: "Point",
         coordinates: [Number(longitude), Number(latitude)],
@@ -125,7 +128,7 @@ const registerHospital = async (req, res) => {
       },
       status: "PENDING",
     });
-
+    
     return res.status(200).json({
       success: true,
       message: "Hospital request submitted, Wait for admin to verify"
@@ -141,6 +144,7 @@ const registerHospital = async (req, res) => {
 
 const login = async (req, res) => {
   try {
+    
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({
@@ -160,7 +164,7 @@ const login = async (req, res) => {
 
     const isPasswordMatched = await user.comparePassword(password);
     if (!isPasswordMatched) {
-      return res.status(201).json({
+      return res.status(401).json({
         success: false,
         message: "Enter the correct password",
       });

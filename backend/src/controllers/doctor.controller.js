@@ -1,11 +1,10 @@
 import Doctor from "../models/doctor.model.js";
-import Hospital from "../models/hospital.model.js";
 
 const createDoctor= async (req,res)=>{
     try {
         const doctor=await Doctor.create({
             hospitalId:req.hospitalId,
-            ...req.bady,
+            ...req.body,
         });
 
         if(!doctor){
@@ -16,7 +15,7 @@ const createDoctor= async (req,res)=>{
             })
         }
         
-        res.status(200).json({
+        res.status(201).json({
             success:true,
             data:doctor,
         });
@@ -33,7 +32,7 @@ const createDoctor= async (req,res)=>{
 
 const getHospitalDoctors= async (req,res)=>{
     try {
-        const doctors=await Doctor.findOne({hospitalId:req.hospitalId}).sort({createdAt:-1}); //jaayega or check krega ki kahi koi hospitalId field main iss field ka koi hai kya?....sort doctor on the basis of creation time.
+        const doctors=await Doctor.find({hospitalId:req.hospitalId}).sort({createdAt:-1}); //jaayega or check krega ki kahi koi hospitalId field main iss field ka koi hai kya?....sort doctor on the basis of creation time.
 
         return res.status(200).json({
             success:true,
@@ -87,7 +86,7 @@ const updateDoctor= async (req,res)=>{
 
 
         const doctorId=req.params.id;
-        const doctor=await Doctor.findByIdAndUpdate({
+        const doctor=await Doctor.findOneAndUpdate({
             _id:req.params.id,
             hospitalId:req.hospitalId
         },

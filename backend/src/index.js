@@ -1,7 +1,6 @@
 import "dotenv/config";
 //aisa isliye kiye kyuki .env file baad main execute ho rha tha pehle app.js execute hoo rha tha
-console.log("DOTENV is loaded");
-console.log("DOTENV is loaded");
+console.log("\nDOTENV is loaded");
 import connectDB from "./config/db.js";
 import { app } from "./app.js";
 
