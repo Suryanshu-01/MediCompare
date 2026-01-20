@@ -1,7 +1,7 @@
 import User from "../models/user.model.js";
 import Hospital from "../models/hospital.model.js";
 import uploadToCloudinary from "../utils/cloudinaryUpload.js";
-
+//to register normal user
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, phone } = req.body;
