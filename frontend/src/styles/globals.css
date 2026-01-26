@@ -1,0 +1,26 @@
+/* ==========================================
+   GLOBALS.CSS
+   ==========================================
+   - Import Tailwind utilities
+   - Base global styles
+   - Custom CSS variables (optional)
+*/
+
+/* Import Tailwind CSS */
+@import "tailwindcss";
+
+/* Optional: Custom global styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply antialiased;
+}
+
+/* Remove default input styling for better control */
+input,
+textarea,
+select {
+  @apply w-full;
+}

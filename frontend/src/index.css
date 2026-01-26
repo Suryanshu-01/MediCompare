@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+/* Global base styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f8fafc;
+  color: #0f172a;
+  min-height: 100vh;
+}
+
+/* Utility overrides for form controls */
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
