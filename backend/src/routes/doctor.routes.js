@@ -7,14 +7,15 @@ import {
   updateDoctor,
   getHospitalDoctors,
 } from "../controllers/doctor.controller.js";
+import upload from "../middlewares/upload.middleware.js";
 
 
 const router=express.Router();
 
-router.post("/",createDoctor);
+router.post("/", upload.single('photo'), createDoctor);
 router.get("/",getHospitalDoctors)
 router.get("/:id",getDoctorById)
-router.patch("/:id",updateDoctor);
+router.patch("/:id", upload.single('photo'), updateDoctor);
 router.delete("/:id",deleteDoctor);
 
 export default router;

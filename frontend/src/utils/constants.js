@@ -29,7 +29,7 @@ export const GENDER = {
 
 // API CONFIG
 export const API_BASE_URL =
-  import.meta.env.VITE_API_URL || 'http://localhost:8001/api';
+  import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // API ENDPOINTS (FIXED)
 export const API_ENDPOINTS = {
@@ -82,6 +82,7 @@ export const ROUTES = {
 
   DOCTORS: '/hospital/doctors',
   ADD_DOCTOR: '/hospital/doctor/add',
+  EDIT_DOCTOR: '/hospital/doctors/:id/edit',
 
   NOT_FOUND: '*',
 };

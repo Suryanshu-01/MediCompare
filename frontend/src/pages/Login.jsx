@@ -40,8 +40,8 @@ export default function Login() {
     try {
       const response = await authService.login(email, password);
       
-      // Save to context + localStorage
-      login(response.token, response.user);
+      // Save to context + localStorage (include hospital data if present)
+      login(response.token, response.user, response.hospital);
 
       // Redirect based on role
       if (response.user.role === 'ADMIN') {

@@ -8,6 +8,10 @@ import { ROUTES } from './utils/constants';
 // Pages
 import Login from './pages/Login';
 import Register from './pages/Register';
+import AddDoctor from './pages/AddDoctor';
+import DoctorList from './pages/DoctorList';
+import EditDoctor from './pages/EditDoctor';
+import HospitalDashboard from './pages/HospitalDashboard';
 
 // Placeholder pages (create later)
 const UserDashboard = () => (
@@ -15,15 +19,6 @@ const UserDashboard = () => (
     <div className="max-w-6xl mx-auto">
       <h1 className="text-4xl font-bold text-gray-900">User Dashboard</h1>
       <p className="text-gray-600 mt-2">Welcome! Explore hospitals and services.</p>
-    </div>
-  </div>
-);
-
-const HospitalDashboard = () => (
-  <div className="min-h-screen bg-gray-50 p-8">
-    <div className="max-w-6xl mx-auto">
-      <h1 className="text-4xl font-bold text-gray-900">Hospital Dashboard</h1>
-      <p className="text-gray-600 mt-2">Manage your hospital profile and doctors.</p>
     </div>
   </div>
 );
@@ -67,6 +62,42 @@ function AppRoutes() {
           <ProtectedRoute>
             <RoleRoute requiredRole="HOSPITAL">
               <HospitalDashboard />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Protected Routes - Add Doctor */}
+      <Route
+        path="/hospital/doctors/add"
+        element={
+          <ProtectedRoute>
+            <RoleRoute requiredRole="HOSPITAL">
+              <AddDoctor />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Protected Routes - Doctor List */}
+      <Route
+        path="/hospital/doctors"
+        element={
+          <ProtectedRoute>
+            <RoleRoute requiredRole="HOSPITAL">
+              <DoctorList />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Protected Routes - Edit Doctor */}
+      <Route
+        path="/hospital/doctors/:doctorId/edit"
+        element={
+          <ProtectedRoute>
+            <RoleRoute requiredRole="HOSPITAL">
+              <EditDoctor />
             </RoleRoute>
           </ProtectedRoute>
         }

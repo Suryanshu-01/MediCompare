@@ -179,7 +179,32 @@ const login = async (req, res) => {
           message: "Hospital is not verifired by user",
         });
       }
+      
+      // Return hospital data along with user
+      const token = user.generateJWT();
+      return res.status(200).json({
+        success: true,
+        message: "Login successful",
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+        hospital: {
+          id: hospital._id,
+          hospitalName: hospital.name,
+          email: hospital.email,
+          phone: hospital.phone,
+          address: hospital.address,
+          status: hospital.status,
+          longitude: hospital.location?.coordinates?.[0] || null,
+          latitude: hospital.location?.coordinates?.[1] || null,
+        },
+      });
     }
+    
     const token = user.generateJWT();
 
     res.status(200).json({

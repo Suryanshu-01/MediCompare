@@ -18,6 +18,7 @@ import {
   validateFile,
   validateCoordinates,
   validateRequired,
+  validatePassword,
 } from '../utils/validators';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../utils/constants';
 
@@ -29,6 +30,7 @@ export default function HospitalSignup() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    password: '',
     phone: '',
     address: '',
     lng: '',
@@ -89,6 +91,9 @@ export default function HospitalSignup() {
     const addressValidation = validateRequired(formData.address, 'Address');
     if (!addressValidation.isValid) newErrors.address = addressValidation.error;
 
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) newErrors.password = passwordValidation.error;
+
     const coordValidation = validateCoordinates(formData.lng, formData.lat);
     if (!coordValidation.isValid) newErrors.coordinates = coordValidation.error;
 
@@ -98,14 +103,17 @@ export default function HospitalSignup() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      console.log('Validation errors:', newErrors);
       return;
     }
+
+    console.log('Form validation passed, preparing submission...');
 
     // Prepare FormData
     const fd = new FormData();
     fd.append('hospitalName', formData.name);
     fd.append('email', formData.email);
-    fd.append('password', formData.email); // Temporary - backend requires it
+    fd.append('password', formData.password);
     fd.append('phone', formData.phone);
     fd.append('address', formData.address);
     fd.append('longitude', formData.lng);
@@ -116,18 +124,27 @@ export default function HospitalSignup() {
     setLoading(true);
     setUploading(true);
     try {
-      // Simulate progress (optional - backend can send real progress)
+      console.log('Starting API call with FormData:', {
+        hospitalName: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        lng: formData.lng,
+        lat: formData.lat,
+        hasDocument: !!document,
+      });
+
+      // Simulate progress (0-90%, capped at 90%)
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return prev;
-          }
-          return prev + Math.random() * 20;
+          const newProgress = prev + Math.random() * 20;
+          // Cap at 90% until upload completes
+          return Math.min(newProgress, 90);
         });
       }, 300);
 
       const response = await authService.hospitalRegister(fd);
+      console.log('API Response:', response);
 
       clearInterval(progressInterval);
       setUploadProgress(100);
@@ -139,6 +156,7 @@ export default function HospitalSignup() {
         navigate('/');
       }, 2000);
     } catch (error) {
+      console.log('Error occurred:', error);
       setApiError(error.message || ERROR_MESSAGES.REGISTRATION_FAILED);
     } finally {
       setLoading(false);
@@ -190,6 +208,20 @@ export default function HospitalSignup() {
           className="mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
+      </div>
+
+      {/* Password */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Password</label>
+        <input
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleInputChange}
+          placeholder="••••••••"
+          className="mt-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        {errors.password && <p className="text-red-600 text-sm mt-1">{errors.password}</p>}
       </div>
 
       {/* Phone */}
