@@ -6,15 +6,21 @@ import hospitalRoutes from "./routes/hospital.routes.js";
 
 const app = express();
 
-const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
-  .split(",")
-  .map((origin) => origin.trim());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://medicompare.vercel.app",
+];
 
 app.use(
   cors({
-    origin: (origin, callback) => {
+    origin: function (origin, callback) {
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
+
+      if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      }
+
+      console.log("Blocked by CORS:", origin);
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
