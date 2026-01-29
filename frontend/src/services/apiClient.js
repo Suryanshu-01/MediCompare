@@ -1,12 +1,13 @@
-import axios from 'axios';
-import { API_BASE_URL, STORAGE_KEYS } from '../utils/constants';
+import axios from "axios";
+import { API_BASE_URL, STORAGE_KEYS } from "../utils/constants";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   timeout: 10000,
+  withCredentials: true,
 });
 
 // REQUEST INTERCEPTOR
@@ -19,12 +20,12 @@ apiClient.interceptors.request.use(
     }
 
     if (config.data instanceof FormData) {
-      delete config.headers['Content-Type'];
+      delete config.headers["Content-Type"];
     }
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // RESPONSE INTERCEPTOR
@@ -33,7 +34,7 @@ apiClient.interceptors.response.use(
   (error) => {
     if (!error.response) {
       return Promise.reject({
-        message: 'Network error. Please check your connection.',
+        message: "Network error. Please check your connection.",
       });
     }
 
@@ -43,33 +44,33 @@ apiClient.interceptors.response.use(
       localStorage.removeItem(STORAGE_KEYS.HOSPITAL);
 
       // Safer redirect
-      window.location.replace('/');
+      window.location.replace("/");
 
       return Promise.reject({
-        message: 'Session expired. Please login again.',
+        message: "Session expired. Please login again.",
       });
     }
 
     if (error.response.status === 403) {
       return Promise.reject({
-        message: 'You do not have permission to perform this action.',
+        message: "You do not have permission to perform this action.",
       });
     }
 
     if (error.response.status === 404) {
       return Promise.reject({
-        message: 'Resource not found.',
+        message: "Resource not found.",
       });
     }
 
     if (error.response.status >= 500) {
       return Promise.reject({
-        message: 'Server error. Please try again later.',
+        message: "Server error. Please try again later.",
       });
     }
 
     return Promise.reject(error.response.data);
-  }
+  },
 );
 
 export default apiClient;
