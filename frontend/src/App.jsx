@@ -12,16 +12,9 @@ import AddDoctor from './pages/AddDoctor';
 import DoctorList from './pages/DoctorList';
 import EditDoctor from './pages/EditDoctor';
 import HospitalDashboard from './pages/HospitalDashboard';
-
-// Placeholder pages (create later)
-const UserDashboard = () => (
-  <div className="min-h-screen bg-gray-50 p-8">
-    <div className="max-w-6xl mx-auto">
-      <h1 className="text-4xl font-bold text-gray-900">User Dashboard</h1>
-      <p className="text-gray-600 mt-2">Welcome! Explore hospitals and services.</p>
-    </div>
-  </div>
-);
+import UserDashboard from './pages/UserDashboard';
+import HospitalUserDashboard from './pages/HospitalUserDashboard';
+import HospitalList from './pages/HospitalList';
 
 const AdminDashboard = () => (
   <div className="min-h-screen bg-gray-50 p-8">
@@ -98,6 +91,30 @@ function AppRoutes() {
           <ProtectedRoute>
             <RoleRoute requiredRole="HOSPITAL">
               <EditDoctor />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Public Routes - Hospital Details for Users */}
+      <Route
+        path="/hospital/:hospitalId"
+        element={
+          <ProtectedRoute>
+            <RoleRoute requiredRole="USER">
+              <HospitalUserDashboard />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Public Routes - Hospital List for Users */}
+      <Route
+        path="/hospitals"
+        element={
+          <ProtectedRoute>
+            <RoleRoute requiredRole="USER">
+              <HospitalList />
             </RoleRoute>
           </ProtectedRoute>
         }

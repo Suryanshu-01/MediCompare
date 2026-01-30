@@ -46,6 +46,10 @@ const hospitalSchema = new mongoose.Schema(
         required: true,
       },
     },
+    minFees: {
+      type: Number,
+      default: 0,
+    },
 
     // Cloudinary document
     document: {

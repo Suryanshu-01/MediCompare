@@ -3,6 +3,7 @@ import cors from "cors";
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import hospitalRoutes from "./routes/hospital.routes.js";
+import mapsRoutes from "./routes/maps.routes.js";
 
 const app = express();
 
@@ -35,5 +36,6 @@ app.use(express.static("public"));
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/hospital", hospitalRoutes);
+app.use("/api", mapsRoutes);
 
 export { app };
