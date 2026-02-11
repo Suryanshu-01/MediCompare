@@ -1,8 +1,31 @@
 import axios from "axios";
-import { API_BASE_URL, STORAGE_KEYS } from "../utils/constants";
+import {
+  LOCAL_API_URL,
+  REMOTE_API_URL,
+  STORAGE_KEYS,
+} from "../utils/constants";
+
+// Function to check if local backend is available
+const checkLocalBackend = async () => {
+  try {
+    await axios.get(`${LOCAL_API_URL}/health`, { timeout: 2000 });
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+// Determine which backend to use
+let baseURL = LOCAL_API_URL;
+const isLocalAvailable = await checkLocalBackend();
+
+if (!isLocalAvailable) {
+  baseURL = REMOTE_API_URL;
+} else {
+}
 
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: baseURL,
   headers: {
     "Content-Type": "application/json",
   },

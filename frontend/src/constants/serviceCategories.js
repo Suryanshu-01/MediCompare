@@ -1,0 +1,15 @@
+export const SERVICE_CATEGORIES = [
+  "Blood Test",
+  "Imaging",
+  "Radiology",
+  "Cardiology",
+  "Neurology",
+  "Pathology",
+  "Orthopedics",
+  "Urology",
+  "Gynecology",
+  "Dermatology",
+  "ENT",
+  "Dental",
+  "General",
+];

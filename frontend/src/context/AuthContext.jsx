@@ -9,9 +9,6 @@ export const AuthContext = createContext(null);
 // Wrap your entire app with this to make auth state available everywhere
 
 export const AuthProvider = ({ children }) => {
-  
-  // Token: JWT from backend, sent with every request
-  // Initialize from localStorage, so user stays logged in after refresh
   const [token, setToken] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.TOKEN) || null;
   });

@@ -179,6 +179,7 @@ const login = async (req, res) => {
           message: "Hospital is not verifired by user",
         });
       }
+      console.log("local backend is used");
       
       // Return hospital data along with user
       const token = user.generateJWT();

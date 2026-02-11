@@ -62,7 +62,7 @@ export default function HospitalDashboard() {
         {/* Quick Actions */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Add Doctor Card */}
             <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
               <div className="flex items-start space-x-4">
@@ -104,6 +104,29 @@ export default function HospitalDashboard() {
                     className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition"
                   >
                     View All Doctors
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Add Service Card */}
+            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+              <div className="flex items-start space-x-4">
+                <div className="bg-purple-100 rounded-full p-3">
+                  <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Add New Service</h3>
+                  <p className="text-gray-600 mb-4">
+                    Add a new test/service with LOINC suggestions to avoid spelling mistakes
+                  </p>
+                  <button
+                    onClick={() => navigate('/hospital/services/add')}
+                    className="bg-purple-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"
+                  >
+                    Add Service
                   </button>
                 </div>
               </div>

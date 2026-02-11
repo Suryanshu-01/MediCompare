@@ -15,6 +15,8 @@ import HospitalDashboard from './pages/HospitalDashboard';
 import UserDashboard from './pages/UserDashboard';
 import HospitalUserDashboard from './pages/HospitalUserDashboard';
 import HospitalList from './pages/HospitalList';
+import ServicesList from './pages/hospital/Services/ServicesList';
+import AddService from './pages/hospital/Services/AddService';
 
 const AdminDashboard = () => (
   <div className="min-h-screen bg-gray-50 p-8">
@@ -91,6 +93,30 @@ function AppRoutes() {
           <ProtectedRoute>
             <RoleRoute requiredRole="HOSPITAL">
               <EditDoctor />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Protected Routes - Hospital Services */}
+      <Route
+        path="/hospital/services"
+        element={
+          <ProtectedRoute>
+            <RoleRoute requiredRole="HOSPITAL">
+              <ServicesList />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Protected Routes - Add Service */}
+      <Route
+        path="/hospital/services/add"
+        element={
+          <ProtectedRoute>
+            <RoleRoute requiredRole="HOSPITAL">
+              <AddService />
             </RoleRoute>
           </ProtectedRoute>
         }

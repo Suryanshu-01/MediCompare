@@ -43,6 +43,18 @@ export default function HospitalNavbar() {
                 Doctors
               </button>
               <button
+                onClick={() => navigate('/hospital/services')}
+                className="text-gray-700 hover:text-blue-600 font-medium transition"
+              >
+                Services
+              </button>
+              <button
+                onClick={() => navigate('/hospital/services/add')}
+                className="text-gray-700 hover:text-blue-600 font-medium transition"
+              >
+                Add Service
+              </button>
+              <button
                 onClick={() => navigate('/hospital/doctors/add')}
                 className="text-gray-700 hover:text-blue-600 font-medium transition"
               >

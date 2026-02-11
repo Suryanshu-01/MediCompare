@@ -17,7 +17,7 @@ const doctorSchema= new Schema(
             type:String,
             enum:["MALE","FEMALE","OTHER"],
         },
-        photo:{
+            photo:{
             url:String,
             publicId:String
         },
