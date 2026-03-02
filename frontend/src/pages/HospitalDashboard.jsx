@@ -1,8 +1,4 @@
-// ==========================================
-// HOSPITAL DASHBOARD PAGE
-// ==========================================
-// Main dashboard for hospital staff
-// Quick access to manage doctors
+
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';

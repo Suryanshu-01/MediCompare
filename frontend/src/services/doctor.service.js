@@ -3,12 +3,12 @@
 // ==========================================
 // API calls for doctor CRUD operations
 
-import apiClient from './apiClient';
+import apiClient from "./apiClient";
 
 // Add new doctor
 export const addDoctor = async (doctorData) => {
   try {
-    const response = await apiClient.post('/hospital/doctors', doctorData);
+    const response = await apiClient.post("/hospital/doctors", doctorData);
     return response.data;
   } catch (error) {
     throw error;
@@ -18,7 +18,7 @@ export const addDoctor = async (doctorData) => {
 // Get doctors for hospital
 export const getDoctors = async () => {
   try {
-    const response = await apiClient.get('/hospital/doctors');
+    const response = await apiClient.get("/hospital/doctors");
     return response.data;
   } catch (error) {
     throw error;
@@ -35,10 +35,23 @@ export const getDoctorById = async (doctorId) => {
   }
 };
 
+// Get doctors by hospital ID (for public view)
+export const getDoctorsByHospitalId = async (hospitalId) => {
+  try {
+    const response = await apiClient.get(`/doctor/hospital/${hospitalId}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // Update doctor
 export const updateDoctor = async (doctorId, doctorData) => {
   try {
-    const response = await apiClient.patch(`/hospital/doctors/${doctorId}`, doctorData);
+    const response = await apiClient.patch(
+      `/hospital/doctors/${doctorId}`,
+      doctorData,
+    );
     return response.data;
   } catch (error) {
     throw error;
@@ -59,6 +72,7 @@ const doctorService = {
   addDoctor,
   getDoctors,
   getDoctorById,
+  getDoctorsByHospitalId,
   updateDoctor,
   deleteDoctor,
 };

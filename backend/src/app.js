@@ -5,6 +5,9 @@ import adminRoutes from "./routes/admin.routes.js";
 import hospitalRoutes from "./routes/hospital.routes.js";
 import mapsRoutes from "./routes/maps.routes.js";
 import loincRoutes from "./routes/loinc.routes.js";
+import authMiddleware from "./middlewares/auth.middleware.js";
+import { getDoctorsByHospitalId } from "./controllers/doctor.controller.js";
+import { getServicesByHospitalId } from "./controllers/services.controller.js";
 
 const app = express();
 
@@ -44,5 +47,18 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/hospital", hospitalRoutes);
 app.use("/api", mapsRoutes);
 app.use("/api/services/loinc", loincRoutes);
+
+// Public routes - for users to view hospital doctors and services
+// Only requires authentication, no role restrictions
+app.get(
+  "/api/doctor/hospital/:hospitalId",
+  authMiddleware,
+  getDoctorsByHospitalId,
+);
+app.get(
+  "/api/services/hospital/:hospitalId",
+  authMiddleware,
+  getServicesByHospitalId,
+);
 
 export { app };

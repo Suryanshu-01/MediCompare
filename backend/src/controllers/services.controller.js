@@ -101,7 +101,7 @@ const updateService = async (req, res) => {
     const service = await Service.findOneAndUpdate(
       { _id: id, hospitalId: req.hospitalId },
       req.body,
-      { new: true }
+      { new: true },
     );
 
     if (!service) {
@@ -134,7 +134,7 @@ const deleteService = async (req, res) => {
     const service = await Service.findOneAndUpdate(
       { _id: id, hospitalId: req.hospitalId },
       { isActive: false },
-      { new: true }
+      { new: true },
     );
 
     if (!service) {
@@ -156,10 +156,38 @@ const deleteService = async (req, res) => {
   }
 };
 
+/**
+ * GET SERVICES BY HOSPITAL ID
+ * Public endpoint - allows users to view services of any hospital
+ */
+const getServicesByHospitalId = async (req, res) => {
+  try {
+    const { hospitalId } = req.params;
+
+    // Find all active services for the specified hospital
+    const services = await Service.find({
+      hospitalId: hospitalId,
+      isActive: true,
+    }).sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: services,
+    });
+  } catch (error) {
+    console.log("Error fetching services by hospital:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch services",
+    });
+  }
+};
+
 export {
   createService,
   getHospitalServices,
   getServicesById,
   updateService,
   deleteService,
+  getServicesByHospitalId,
 };

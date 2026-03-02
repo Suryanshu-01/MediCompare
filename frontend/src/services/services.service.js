@@ -10,6 +10,11 @@ export const getHospitalServices = async () => {
   return res.data.data;
 };
 
+export const getServicesByHospitalId = async (hospitalId) => {
+  const res = await apiClient.get(`/services/hospital/${hospitalId}`);
+  return res.data.data;
+};
+
 export const updateService = async (id, payload) => {
   const res = await apiClient.patch(`/hospital/services/${id}`, payload);
   return res.data;
@@ -23,6 +28,7 @@ export const deleteService = async (id) => {
 const servicesService = {
   createService,
   getHospitalServices,
+  getServicesByHospitalId,
   updateService,
   deleteService,
 };
