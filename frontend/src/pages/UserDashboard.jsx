@@ -180,18 +180,28 @@ const UserDashboard = () => {
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && data.data) {
-                        data.data.forEach(({ _id, name, lng, lat, minFees }) => {
+                        data.data.forEach(({ _id, name, lng, lat, minFees, doctorRating, serviceRating, serviceMinPrice, serviceMaxPrice }) => {
                             const popup = new mapboxgl.Popup({
                                 offset: 25,
                                 closeButton: false,
                                 closeOnClick: false
                             })
                                 .setHTML(`
-                                    <div class="popup-card">
+                                    <div class="popup-card" style="font-size: 12px;">
                                         <h3 class="popup-title" style="margin: 0; padding: 5px; font-size: 14px; font-weight: bold;">
                                             ${name}
                                         </h3>
-                                        <h4>${minFees}</h4>
+                                        <p style="margin: 0 0 4px 0;"><strong>Min Consultation Fee:</strong> ₹${typeof minFees === 'number' ? minFees : 'N/A'}</p>
+                                        <p style="margin: 0 0 4px 0;"><strong>Doctor Rating:</strong> ${typeof doctorRating === 'number' ? doctorRating.toFixed(1) + '/10' : 'N/A'}</p>
+                                        <p style="margin: 0 0 4px 0;"><strong>Service Rating:</strong> ${typeof serviceRating === 'number' ? serviceRating.toFixed(1) + '/10' : 'N/A'}</p>
+                                        <p style="margin: 0;">
+                                            <strong>Service Fee Range:</strong>
+                                            ${
+                                                typeof serviceMinPrice === 'number' && typeof serviceMaxPrice === 'number'
+                                                    ? `₹${serviceMinPrice} - ₹${serviceMaxPrice}`
+                                                    : 'N/A'
+                                            }
+                                        </p>
                                     </div>
                                 `);
 
