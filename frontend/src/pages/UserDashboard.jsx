@@ -49,14 +49,36 @@ const UserDashboard = () => {
 
     // Initialize map
     useEffect(() => {
-        mapboxgl.accessToken = 'pk.eyJ1IjoicHJha2hhci0yMDA1LTA5IiwiYSI6ImNta2ppc25kNzE0bm0zZ3IxOWg5ZXlzdWcifQ.QVPY73GP8VqBxJWYko0cGg';
+        mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
         mapRef.current = new mapboxgl.Map({
             container: mapContainerRef.current,
-            center: [78.163446, 26.200719], // starting position [lng, lat]
+            center: [78.163446, 26.200719], // default start position [lng, lat]
             style: 'mapbox://styles/mapbox/light-v11',
             zoom: 13 // starting zoom
         });
+
+        // attempt to get user's geolocation and recenter map
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLng = position.coords.longitude;
+                    const userLat = position.coords.latitude;
+                    if (mapRef.current) {
+                        mapRef.current.setCenter([userLng, userLat]);
+                        mapRef.current.setZoom(12);
+                        // add a marker for the user's location
+                        new mapboxgl.Marker({ color: 'blue' })
+                            .setLngLat([userLng, userLat])
+                            .addTo(mapRef.current);
+                    }
+                },
+                (err) => {
+                    console.warn('Geolocation failed or denied:', err.message);
+                }
+            );
+        }
+
         // Fetch hospitals when map is loaded
         mapRef.current.on('load', () => {
             fetchHospitals();
