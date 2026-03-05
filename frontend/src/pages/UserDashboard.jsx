@@ -19,6 +19,7 @@ const UserDashboard = () => {
     const debouncedQuery = useDebounce(searchQuery, 400);
     const [searchResults, setSearchResults] = useState({ hospitals: [], doctors: [], services: [] });
     const [searchLoading, setSearchLoading] = useState(false);
+    const [sortMode, setSortMode] = useState(null); // 'rating' | 'fees' | null
 
     // Fetch hospitals
     const fetchHospitals = async () => {
@@ -68,6 +69,56 @@ const UserDashboard = () => {
             return;
         }
         handleHospitalClick(hospital);
+    };
+
+    // helpers: get hospital-level metrics for a given doctor/service
+    const getDoctorHospital = (doctor) =>
+        hospitals.find((h) => h._id === doctor.hospitalId);
+
+    const getServiceHospital = (service) =>
+        hospitals.find((h) => h._id === service.hospitalId);
+
+    const getDoctorRatingValue = (doctor) => {
+        const hosp = getDoctorHospital(doctor);
+        return typeof hosp?.doctorRating === 'number' ? hosp.doctorRating : 0;
+    };
+
+    const getServiceRatingValue = (service) => {
+        const hosp = getServiceHospital(service);
+        return typeof hosp?.serviceRating === 'number' ? hosp.serviceRating : 0;
+    };
+
+    // Derived, sorted lists for doctors and services based on sortMode
+    const getSortedDoctors = () => {
+        if (sortMode === 'rating') {
+            return [...searchResults.doctors].sort(
+                (a, b) => getDoctorRatingValue(b) - getDoctorRatingValue(a)
+            );
+        }
+        if (sortMode === 'fees') {
+            return [...searchResults.doctors].sort(
+                (a, b) =>
+                    (a.consultationFee ?? Number.MAX_VALUE) -
+                    (b.consultationFee ?? Number.MAX_VALUE)
+            );
+        }
+        return searchResults.doctors;
+    };
+
+    const getSortedServices = () => {
+        if (sortMode === 'rating') {
+            return [...searchResults.services].sort(
+                (a, b) => getServiceRatingValue(b) - getServiceRatingValue(a)
+            );
+        }
+        if (sortMode === 'fees') {
+            return [...searchResults.services].sort(
+                (a, b) =>
+                    (a.price ?? Number.MAX_VALUE) -
+                    (b.price ?? Number.MAX_VALUE)
+            );
+        }
+        return searchResults.services;
     };
 
     // run search when debounced query changes
@@ -190,14 +241,42 @@ const UserDashboard = () => {
             </div>
 
             {/* Search bar */}
-            <div className="max-w-7xl mx-auto px-8 py-4">
+            <div className="max-w-7xl mx-auto px-8 py-4 flex items-center gap-4">
                 <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search hospitals, doctors, services..."
-                    className="w-full border rounded px-4 py-2"
+                    className="flex-1 border rounded px-4 py-2"
                 />
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setSortMode((prev) => (prev === 'rating' ? null : 'rating'))
+                        }
+                        className={`px-4 py-2 text-sm font-semibold rounded-lg border ${
+                            sortMode === 'rating'
+                                ? 'bg-blue-600 text-white border-blue-600'
+                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        }`}
+                    >
+                        Rating
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setSortMode((prev) => (prev === 'fees' ? null : 'fees'))
+                        }
+                        className={`px-4 py-2 text-sm font-semibold rounded-lg border ${
+                            sortMode === 'fees'
+                                ? 'bg-blue-600 text-white border-blue-600'
+                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        }`}
+                    >
+                        Fees
+                    </button>
+                </div>
             </div>
 
             {/* Main Content - Two Column Layout */}
@@ -232,30 +311,68 @@ const UserDashboard = () => {
                                                     ))}
                                                 </div>
                                             )}
-                                            {searchResults.doctors.length > 0 && (
+                                            {getSortedDoctors().length > 0 && (
                                                 <div>
                                                     <h3 className="font-semibold">Doctors</h3>
-                                                    {searchResults.doctors.map((d) => (
+                                                    {getSortedDoctors().map((d) => (
                                                         <div
                                                             key={d._id}
                                                             onClick={() => handleDoctorClick(d)}
-                                                            className="p-2 bg-white rounded shadow cursor-pointer hover:bg-gray-50"
+                                                            className="p-2 bg-white rounded shadow cursor-pointer hover:bg-gray-50 flex items-center justify-between"
                                                         >
-                                                            {d.name} ({d.specialization})
+                                                            <span>
+                                                                {d.name} ({d.specialization})
+                                                            </span>
+                                                            {sortMode === 'rating' && (
+                                                                <span className="text-xs font-semibold text-gray-700">
+                                                                    {(() => {
+                                                                        const rating = getDoctorRatingValue(d);
+                                                                        return rating > 0
+                                                                            ? `${rating.toFixed(1)}/10`
+                                                                            : 'N/A';
+                                                                    })()}
+                                                                </span>
+                                                            )}
+                                                            {sortMode === 'fees' && (
+                                                                <span className="text-xs font-semibold text-gray-700">
+                                                                    {typeof d.consultationFee === 'number'
+                                                                        ? `₹${d.consultationFee}`
+                                                                        : 'N/A'}
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     ))}
                                                 </div>
                                             )}
-                                            {searchResults.services.length > 0 && (
+                                            {getSortedServices().length > 0 && (
                                                 <div>
                                                     <h3 className="font-semibold">Services</h3>
-                                                    {searchResults.services.map((s) => (
+                                                    {getSortedServices().map((s) => (
                                                         <div
                                                             key={s._id}
                                                             onClick={() => handleServiceClick(s)}
-                                                            className="p-2 bg-white rounded shadow cursor-pointer hover:bg-gray-50"
+                                                            className="p-2 bg-white rounded shadow cursor-pointer hover:bg-gray-50 flex items-center justify-between"
                                                         >
-                                                            {s.displayName} [{s.category}]
+                                                            <span>
+                                                                {s.displayName} [{s.category}]
+                                                            </span>
+                                                            {sortMode === 'rating' && (
+                                                                <span className="text-xs font-semibold text-gray-700">
+                                                                    {(() => {
+                                                                        const rating = getServiceRatingValue(s);
+                                                                        return rating > 0
+                                                                            ? `${rating.toFixed(1)}/10`
+                                                                            : 'N/A';
+                                                                    })()}
+                                                                </span>
+                                                            )}
+                                                            {sortMode === 'fees' && (
+                                                                <span className="text-xs font-semibold text-gray-700">
+                                                                    {typeof s.price === 'number'
+                                                                        ? `₹${s.price}`
+                                                                        : 'N/A'}
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     ))}
                                                 </div>
@@ -297,12 +414,22 @@ const UserDashboard = () => {
 
                                             <div className="space-y-1 text-sm text-gray-700">
                                                 <div className="flex items-center">
-                                                    <span className="font-semibold mr-2">Lng:</span>
-                                                    <span>{hospital.lng.toFixed(6)}</span>
+                                                    <span className="font-semibold mr-2">Address:</span>
+                                                    <span>{hospital.address || 'Not available'}</span>
                                                 </div>
-                                                <div className="flex items-center">
-                                                    <span className="font-semibold mr-2">Lat:</span>
-                                                    <span>{hospital.lat.toFixed(6)}</span>
+                                                <div className="flex flex-wrap gap-3 text-xs text-gray-600 mt-1">
+                                                    <span>
+                                                        <span className="font-semibold">Doctor Rating:</span>{' '}
+                                                        {typeof hospital.doctorRating === 'number'
+                                                            ? `${hospital.doctorRating.toFixed(1)}/10`
+                                                            : 'N/A'}
+                                                    </span>
+                                                    <span>
+                                                        <span className="font-semibold">Service Rating:</span>{' '}
+                                                        {typeof hospital.serviceRating === 'number'
+                                                            ? `${hospital.serviceRating.toFixed(1)}/10`
+                                                            : 'N/A'}
+                                                    </span>
                                                 </div>
                                             </div>
 

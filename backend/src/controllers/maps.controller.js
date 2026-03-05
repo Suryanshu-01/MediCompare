@@ -11,6 +11,10 @@ export const getVerifiedHospitals = async (req, res) => {
                 name: 1,
                 location: 1,
                 minFees: 1,
+                address: 1,
+                doctorRating: 1,
+                serviceRating: 1,
+                hospitalRating: 1,
             }
         );
 
@@ -21,6 +25,10 @@ export const getVerifiedHospitals = async (req, res) => {
             lng: hospital.location.coordinates[0],
             lat: hospital.location.coordinates[1],
             minFees: hospital.minFees,
+            address: hospital.address,
+            doctorRating: hospital.doctorRating,
+            serviceRating: hospital.serviceRating,
+            hospitalRating: hospital.hospitalRating,
         }));
 
         res.status(200).json({

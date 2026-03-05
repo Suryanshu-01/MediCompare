@@ -68,6 +68,12 @@ const doctorSchema= new Schema(
             required:true,
             maxlength:500,
         },
+        doctorRating:{
+            type:Number,
+            min:0,
+            max:10,
+            default:0
+        },
         isActive:{
             type:Boolean,
             default:true
