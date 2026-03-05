@@ -4,6 +4,7 @@ import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import hospitalRoutes from "./routes/hospital.routes.js";
 import mapsRoutes from "./routes/maps.routes.js";
+import searchRoutes from "./routes/search.routes.js";
 import loincRoutes from "./routes/loinc.routes.js";
 import authMiddleware from "./middlewares/auth.middleware.js";
 import { getDoctorsByHospitalId } from "./controllers/doctor.controller.js";
@@ -47,6 +48,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/hospital", hospitalRoutes);
 app.use("/api", mapsRoutes);
 app.use("/api/services/loinc", loincRoutes);
+app.use("/api", searchRoutes);
 
 // Public routes - for users to view hospital doctors and services
 // Only requires authentication, no role restrictions

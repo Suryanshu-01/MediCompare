@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import mapboxgl from 'mapbox-gl';
-import UserNavbar from '../components/layout/UserNavbar';
-
+import UserNavbar from '../components/layout/UserNavbar'; import useDebounce from '../hooks/useDebounce';
+import { searchAll } from '../services/search.service';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const UserDashboard = () => {
@@ -14,6 +14,11 @@ const UserDashboard = () => {
     const [hospitals, setHospitals] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+
+    const [searchQuery, setSearchQuery] = useState('');
+    const debouncedQuery = useDebounce(searchQuery, 400);
+    const [searchResults, setSearchResults] = useState({ hospitals: [], doctors: [], services: [] });
+    const [searchLoading, setSearchLoading] = useState(false);
 
     // Fetch hospitals
     const fetchHospitals = async () => {
@@ -46,6 +51,26 @@ const UserDashboard = () => {
             }
         });
     };
+
+    // run search when debounced query changes
+    useEffect(() => {
+        const runSearch = async () => {
+            if (!debouncedQuery) {
+                setSearchResults({ hospitals: [], doctors: [], services: [] });
+                return;
+            }
+            setSearchLoading(true);
+            try {
+                const data = await searchAll(debouncedQuery);
+                setSearchResults(data);
+            } catch (err) {
+                console.error('Search error', err);
+            } finally {
+                setSearchLoading(false);
+            }
+        };
+        runSearch();
+    }, [debouncedQuery]);
 
     // Initialize map
     useEffect(() => {
@@ -146,6 +171,17 @@ const UserDashboard = () => {
                 </div>
             </div>
 
+            {/* Search bar */}
+            <div className="max-w-7xl mx-auto px-8 py-4">
+                <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search hospitals, doctors, services..."
+                    className="w-full border rounded px-4 py-2"
+                />
+            </div>
+
             {/* Main Content - Two Column Layout */}
             <div className="max-w-7xl mx-auto px-8 py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -156,6 +192,57 @@ const UserDashboard = () => {
                             <h2 className="text-2xl font-bold text-gray-900 mb-6 sticky top-0 bg-white">
 
                             </h2>
+
+                            {/* search results */}
+                            {searchQuery && (
+                                <div className="mb-4">
+                                    {searchLoading ? (
+                                        <p>Searching...</p>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {searchResults.hospitals.length > 0 && (
+                                                <div>
+                                                    <h3 className="font-semibold">Hospitals</h3>
+                                                    {searchResults.hospitals.map((h) => (
+                                                        <div
+                                                            key={h._id}
+                                                            onClick={() => handleHospitalClick(h)}
+                                                            className="p-2 bg-white rounded shadow cursor-pointer hover:bg-gray-50"
+                                                        >
+                                                            {h.name}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            {searchResults.doctors.length > 0 && (
+                                                <div>
+                                                    <h3 className="font-semibold">Doctors</h3>
+                                                    {searchResults.doctors.map((d) => (
+                                                        <div key={d._id} className="p-2 bg-white rounded shadow">
+                                                            {d.name} ({d.specialization})
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            {searchResults.services.length > 0 && (
+                                                <div>
+                                                    <h3 className="font-semibold">Services</h3>
+                                                    {searchResults.services.map((s) => (
+                                                        <div key={s._id} className="p-2 bg-white rounded shadow">
+                                                            {s.displayName} [{s.category}]
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            {searchResults.hospitals.length === 0 &&
+                                                searchResults.doctors.length === 0 &&
+                                                searchResults.services.length === 0 && (
+                                                    <p>No results found</p>
+                                                )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             {loading && (
                                 <div className="flex items-center justify-center py-12">
@@ -170,7 +257,7 @@ const UserDashboard = () => {
                                 </div>
                             )}
 
-                            {!loading && hospitals.length > 0 && (
+                            {!loading && !searchQuery && hospitals.length > 0 && (
                                 <div className="space-y-4">
                                     {hospitals.map((hospital) => (
                                         <div
