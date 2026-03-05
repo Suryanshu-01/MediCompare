@@ -122,6 +122,11 @@ const HospitalUserDashboard = () => {
                                                     <span className="font-semibold">📚 Experience:</span> {doctor.experience} years
                                                 </p>
                                             )}
+                                            {typeof doctor.consultationFee === 'number' && (
+                                                <p>
+                                                    <span className="font-semibold">💰 Consultation Fee:</span> ₹{doctor.consultationFee}
+                                                </p>
+                                            )}
                                         </div>
 
                                         {/* Qualifications */}
@@ -152,7 +157,11 @@ const HospitalUserDashboard = () => {
                                                     </p>
                                                     <p>
                                                         <span className="font-semibold">Time:</span>{' '}
-                                                        {doctor.availability.timeSlots?.join(', ') || 'Not specified'}
+                                                        {doctor.availability.timeSlots && doctor.availability.timeSlots.length > 0
+                                                            ? doctor.availability.timeSlots
+                                                                .map((slot) => `${slot.start} - ${slot.end}`)
+                                                                .join(', ')
+                                                            : 'Not specified'}
                                                     </p>
                                                 </div>
                                             </div>

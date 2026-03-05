@@ -52,6 +52,24 @@ const UserDashboard = () => {
         });
     };
 
+    const handleDoctorClick = (doctor) => {
+        const hospital = hospitals.find((h) => h._id === doctor.hospitalId);
+        if (!hospital) {
+            console.warn('Hospital not found for doctor', doctor);
+            return;
+        }
+        handleHospitalClick(hospital);
+    };
+
+    const handleServiceClick = (service) => {
+        const hospital = hospitals.find((h) => h._id === service.hospitalId);
+        if (!hospital) {
+            console.warn('Hospital not found for service', service);
+            return;
+        }
+        handleHospitalClick(hospital);
+    };
+
     // run search when debounced query changes
     useEffect(() => {
         const runSearch = async () => {
@@ -218,7 +236,11 @@ const UserDashboard = () => {
                                                 <div>
                                                     <h3 className="font-semibold">Doctors</h3>
                                                     {searchResults.doctors.map((d) => (
-                                                        <div key={d._id} className="p-2 bg-white rounded shadow">
+                                                        <div
+                                                            key={d._id}
+                                                            onClick={() => handleDoctorClick(d)}
+                                                            className="p-2 bg-white rounded shadow cursor-pointer hover:bg-gray-50"
+                                                        >
                                                             {d.name} ({d.specialization})
                                                         </div>
                                                     ))}
@@ -228,7 +250,11 @@ const UserDashboard = () => {
                                                 <div>
                                                     <h3 className="font-semibold">Services</h3>
                                                     {searchResults.services.map((s) => (
-                                                        <div key={s._id} className="p-2 bg-white rounded shadow">
+                                                        <div
+                                                            key={s._id}
+                                                            onClick={() => handleServiceClick(s)}
+                                                            className="p-2 bg-white rounded shadow cursor-pointer hover:bg-gray-50"
+                                                        >
                                                             {s.displayName} [{s.category}]
                                                         </div>
                                                     ))}

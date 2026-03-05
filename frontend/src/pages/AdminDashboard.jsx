@@ -10,7 +10,7 @@ import { ROUTES } from '../utils/constants';
 
 // simple placeholder for admin area
 export default function AdminDashboard() {
-    const { user } = useContext(AuthContext);
+    const { user, logout } = useContext(AuthContext);
     const adminName = user?.name || '';
     const navigate = useNavigate();
 
@@ -81,7 +81,13 @@ export default function AdminDashboard() {
                         <div className="h-10 w-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
                             {adminName?.charAt(0) || 'A'}
                         </div>
-                        <button className="bg-red-600 text-white px-5 py-2 rounded-md text-sm font-bold hover:bg-red-700 transition-colors">
+                        <button
+                            onClick={() => {
+                                logout();
+                                navigate(ROUTES.LOGIN);
+                            }}
+                            className="bg-red-600 text-white px-5 py-2 rounded-md text-sm font-bold hover:bg-red-700 transition-colors"
+                        >
                             Logout
                         </button>
                     </div>
