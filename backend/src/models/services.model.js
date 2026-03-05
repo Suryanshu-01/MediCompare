@@ -25,6 +25,12 @@ const servicesSchema= new mongoose.Schema(
             required:true,
             min:0,
         },
+        serviceRating:{
+            type:Number,
+            min:0,
+            max:10,
+            default:0,
+        },
         isActive:{
             type:Boolean,
             default:true,

@@ -3,6 +3,7 @@ import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import UserNavbar from '../components/layout/UserNavbar';
 import doctorService from '../services/doctor.service';
 import servicesService from '../services/services.service';
+import ratingService from '../services/rating.service';
 
 const HospitalUserDashboard = () => {
     const location = useLocation();
@@ -19,6 +20,14 @@ const HospitalUserDashboard = () => {
     const [loadingDoctors, setLoadingDoctors] = useState(true);
     const [loadingServices, setLoadingServices] = useState(true);
     const [error, setError] = useState('');
+    const [doctorRating, setDoctorRating] = useState(null);
+    const [serviceRating, setServiceRating] = useState(null);
+    const [showDoctorRatingModal, setShowDoctorRatingModal] = useState(false);
+    const [showServiceRatingModal, setShowServiceRatingModal] = useState(false);
+    const [doctorRatingInput, setDoctorRatingInput] = useState(0);
+    const [serviceRatingInput, setServiceRatingInput] = useState(0);
+    const [submittingDoctorRating, setSubmittingDoctorRating] = useState(false);
+    const [submittingServiceRating, setSubmittingServiceRating] = useState(false);
 
     // Fetch doctors and services on component mount
     useEffect(() => {
@@ -35,6 +44,13 @@ const HospitalUserDashboard = () => {
                 const servicesResponse = await servicesService.getServicesByHospitalId(hospitalId);
                 setServices(servicesResponse || []);
                 setLoadingServices(false);
+
+                // Fetch existing ratings
+                const ratingsResponse = await ratingService.getHospitalRatings(hospitalId);
+                if (ratingsResponse.success) {
+                    setDoctorRating(ratingsResponse.doctorRating ?? null);
+                    setServiceRating(ratingsResponse.serviceRating ?? null);
+                }
             } catch (err) {
                 console.error('Error fetching data:', err);
                 setError('Failed to load hospital details');
@@ -55,14 +71,28 @@ const HospitalUserDashboard = () => {
             {/* Header Section */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
                 <div className="max-w-7xl mx-auto px-8 py-8">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="mb-4 px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition font-semibold"
-                    >
-                        ← Back
-                    </button>
-                    <h1 className="text-4xl font-bold">{name || 'Hospital Details'}</h1>
-                    <p className="text-blue-100 mt-2">Hospital ID: {hospitalId}</p>
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <button
+                                onClick={() => navigate(-1)}
+                                className="mb-4 px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition font-semibold"
+                            >
+                                ← Back
+                            </button>
+                            <h1 className="text-4xl font-bold">{name || 'Hospital Details'}</h1>
+                            <p className="text-blue-100 mt-2">Hospital ID: {hospitalId}</p>
+                        </div>
+                        <div className="text-right text-sm text-blue-100 space-y-1">
+                            <p>
+                                <span className="font-semibold">Doctor Rating:</span>{' '}
+                                {typeof doctorRating === 'number' ? `${doctorRating.toFixed(1)}/10` : 'Not rated yet'}
+                            </p>
+                            <p>
+                                <span className="font-semibold">Service Rating:</span>{' '}
+                                {typeof serviceRating === 'number' ? `${serviceRating.toFixed(1)}/10` : 'Not rated yet'}
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -122,6 +152,11 @@ const HospitalUserDashboard = () => {
                                                     <span className="font-semibold">📚 Experience:</span> {doctor.experience} years
                                                 </p>
                                             )}
+                                            {typeof doctor.consultationFee === 'number' && (
+                                                <p>
+                                                    <span className="font-semibold">💰 Consultation Fee:</span> ₹{doctor.consultationFee}
+                                                </p>
+                                            )}
                                         </div>
 
                                         {/* Qualifications */}
@@ -152,7 +187,11 @@ const HospitalUserDashboard = () => {
                                                     </p>
                                                     <p>
                                                         <span className="font-semibold">Time:</span>{' '}
-                                                        {doctor.availability.timeSlots?.join(', ') || 'Not specified'}
+                                                        {doctor.availability.timeSlots && doctor.availability.timeSlots.length > 0
+                                                            ? doctor.availability.timeSlots
+                                                                .map((slot) => `${slot.start} - ${slot.end}`)
+                                                                .join(', ')
+                                                            : 'Not specified'}
                                                     </p>
                                                 </div>
                                             </div>
@@ -166,6 +205,18 @@ const HospitalUserDashboard = () => {
                             <p className="text-gray-500 text-lg">No doctors found for this hospital</p>
                         </div>
                     )}
+
+                    <div className="mt-6 flex justify-center">
+                        <button
+                            onClick={() => {
+                                setDoctorRatingInput(0);
+                                setShowDoctorRatingModal(true);
+                            }}
+                            className="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition"
+                        >
+                            Rate our Doctors
+                        </button>
+                    </div>
                 </div>
 
                 {/* Services Section */}
@@ -221,7 +272,128 @@ const HospitalUserDashboard = () => {
                             <p className="text-gray-500 text-lg">No services found for this hospital</p>
                         </div>
                     )}
+
+                    <div className="mt-6 flex justify-center">
+                        <button
+                            onClick={() => {
+                                setServiceRatingInput(0);
+                                setShowServiceRatingModal(true);
+                            }}
+                            className="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition"
+                        >
+                            Rate our Services
+                        </button>
+                    </div>
                 </div>
+
+                {/* Rating Modals */}
+                {showDoctorRatingModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+                            <h3 className="text-lg font-bold mb-4 text-gray-900">Rate our Doctors</h3>
+                            <p className="text-sm text-gray-600 mb-3">Tap a star from 1 to 10.</p>
+                            <div className="flex justify-center gap-1 mb-4">
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
+                                    <button
+                                        key={value}
+                                        type="button"
+                                        onClick={() => setDoctorRatingInput(value)}
+                                        className="text-2xl focus:outline-none"
+                                    >
+                                        <span className={value <= doctorRatingInput ? 'text-yellow-400' : 'text-gray-300'}>
+                                            ★
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="flex justify-between items-center mt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowDoctorRatingModal(false)}
+                                    className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled={submittingDoctorRating || doctorRatingInput === 0}
+                                    onClick={async () => {
+                                        if (!hospitalId || doctorRatingInput === 0) return;
+                                        try {
+                                            setSubmittingDoctorRating(true);
+                                            const res = await ratingService.rateDoctors(hospitalId, doctorRatingInput);
+                                            if (res.success) {
+                                                setDoctorRating(res.doctorRating);
+                                                setShowDoctorRatingModal(false);
+                                            }
+                                        } catch (e) {
+                                            console.error('Failed to submit doctor rating', e);
+                                        } finally {
+                                            setSubmittingDoctorRating(false);
+                                        }
+                                    }}
+                                    className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-50"
+                                >
+                                    {submittingDoctorRating ? 'Submitting...' : 'Submit Rating'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {showServiceRatingModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+                            <h3 className="text-lg font-bold mb-4 text-gray-900">Rate our Services</h3>
+                            <p className="text-sm text-gray-600 mb-3">Tap a star from 1 to 10.</p>
+                            <div className="flex justify-center gap-1 mb-4">
+                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
+                                    <button
+                                        key={value}
+                                        type="button"
+                                        onClick={() => setServiceRatingInput(value)}
+                                        className="text-2xl focus:outline-none"
+                                    >
+                                        <span className={value <= serviceRatingInput ? 'text-yellow-400' : 'text-gray-300'}>
+                                            ★
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="flex justify-between items-center mt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowServiceRatingModal(false)}
+                                    className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled={submittingServiceRating || serviceRatingInput === 0}
+                                    onClick={async () => {
+                                        if (!hospitalId || serviceRatingInput === 0) return;
+                                        try {
+                                            setSubmittingServiceRating(true);
+                                            const res = await ratingService.rateServices(hospitalId, serviceRatingInput);
+                                            if (res.success) {
+                                                setServiceRating(res.serviceRating);
+                                                setShowServiceRatingModal(false);
+                                            }
+                                        } catch (e) {
+                                            console.error('Failed to submit service rating', e);
+                                        } finally {
+                                            setSubmittingServiceRating(false);
+                                        }
+                                    }}
+                                    className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-50"
+                                >
+                                    {submittingServiceRating ? 'Submitting...' : 'Submit Rating'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -51,6 +51,35 @@ const hospitalSchema = new mongoose.Schema(
       default: 0,
     },
 
+    doctorRating: {
+      type: Number,
+      min: 0,
+      max: 10,
+      default: 0,
+    },
+    doctorRatingCount: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
+    serviceRating: {
+      type: Number,
+      min: 0,
+      max: 10,
+      default: 0,
+    },
+    serviceRatingCount: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
+    hospitalRating: {
+      type: Number,
+      min: 0,
+      max: 10,
+      default: 0,
+    },
+
     // Cloudinary document
     document: {
       url: String,

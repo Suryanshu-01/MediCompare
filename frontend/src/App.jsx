@@ -17,15 +17,8 @@ import HospitalUserDashboard from './pages/HospitalUserDashboard';
 import HospitalList from './pages/HospitalList';
 import ServicesList from './pages/hospital/Services/ServicesList';
 import AddService from './pages/hospital/Services/AddService';
-
-const AdminDashboard = () => (
-  <div className="min-h-screen bg-gray-50 p-8">
-    <div className="max-w-6xl mx-auto">
-      <h1 className="text-4xl font-bold text-gray-900">Admin Dashboard</h1>
-      <p className="text-gray-600 mt-2">Verify hospitals and manage platform.</p>
-    </div>
-  </div>
-);
+import AdminDashboard from './pages/AdminDashboard';
+import AdminRejectedHospitals from './pages/AdminRejectedHospitals';
 
 
 //App Routes
@@ -153,6 +146,17 @@ function AppRoutes() {
           <ProtectedRoute>
             <RoleRoute requiredRole="ADMIN">
               <AdminDashboard />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+      {/* Rejected hospitals view */}
+      <Route
+        path={ROUTES.ADMIN_REJECTED_HOSPITALS}
+        element={
+          <ProtectedRoute>
+            <RoleRoute requiredRole="ADMIN">
+              <AdminRejectedHospitals />
             </RoleRoute>
           </ProtectedRoute>
         }
