@@ -59,7 +59,15 @@ const UserDashboard = () => {
             console.warn('Hospital not found for doctor', doctor);
             return;
         }
-        handleHospitalClick(hospital);
+        navigate(`/hospital/${hospital._id}`, {
+            state: {
+                name: hospital.name,
+                lng: hospital.lng,
+                lat: hospital.lat,
+                hospitalId: hospital._id,
+                selectedDoctorId: doctor._id
+            }
+        });
     };
 
     const handleServiceClick = (service) => {
@@ -68,7 +76,14 @@ const UserDashboard = () => {
             console.warn('Hospital not found for service', service);
             return;
         }
-        handleHospitalClick(hospital);
+        navigate(`/hospital/${hospital._id}#services`, {
+            state: {
+                name: hospital.name,
+                lng: hospital.lng,
+                lat: hospital.lat,
+                hospitalId: hospital._id
+            }
+        });
     };
 
     // helpers: get hospital-level metrics for a given doctor/service
@@ -196,11 +211,10 @@ const UserDashboard = () => {
                                         <p style="margin: 0 0 4px 0;"><strong>Service Rating:</strong> ${typeof serviceRating === 'number' ? serviceRating.toFixed(1) + '/10' : 'N/A'}</p>
                                         <p style="margin: 0;">
                                             <strong>Service Fee Range:</strong>
-                                            ${
-                                                typeof serviceMinPrice === 'number' && typeof serviceMaxPrice === 'number'
-                                                    ? `₹${serviceMinPrice} - ₹${serviceMaxPrice}`
-                                                    : 'N/A'
-                                            }
+                                            ${typeof serviceMinPrice === 'number' && typeof serviceMaxPrice === 'number'
+                                        ? `₹${serviceMinPrice} - ₹${serviceMaxPrice}`
+                                        : 'N/A'
+                                    }
                                         </p>
                                     </div>
                                 `);
@@ -251,43 +265,50 @@ const UserDashboard = () => {
             </div>
 
             {/* Search bar */}
-            <div className="max-w-7xl mx-auto px-8 py-4 flex items-center gap-4">
-                <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search hospitals, doctors, services..."
-                    className="flex-1 border rounded px-4 py-2"
-                />
-                <div className="flex items-center gap-2">
-                    <button
-                        type="button"
-                        onClick={() =>
-                            setSortMode((prev) => (prev === 'rating' ? null : 'rating'))
-                        }
-                        className={`px-4 py-2 text-sm font-semibold rounded-lg border ${
-                            sortMode === 'rating'
-                                ? 'bg-blue-600 text-white border-blue-600'
-                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                        }`}
-                    >
-                        Rating
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() =>
-                            setSortMode((prev) => (prev === 'fees' ? null : 'fees'))
-                        }
-                        className={`px-4 py-2 text-sm font-semibold rounded-lg border ${
-                            sortMode === 'fees'
-                                ? 'bg-blue-600 text-white border-blue-600'
-                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                        }`}
-                    >
-                        Fees
-                    </button>
+            <div className="max-w-7xl mx-auto px-5 py-3 flex items-center gap-6 bg-white rounded-xl shadow-sm">
+                {/* Search Input */}
+                <div className="relative flex-1">
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search hospitals, doctors, services..."
+                        className="w-full border-2 border-sky-100 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-400 transition-colors placeholder:text-gray-400"
+                    />
+                </div>
+
+                {/* Sort Section */}
+                <div className="flex items-center gap-4 bg-sky-50 p-1.5 rounded-2xl border border-sky-100">
+                    <span className="text-sm font-bold text-sky-800 ml-3 whitespace-nowrap">
+                        Sort by
+                    </span>
+
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setSortMode((prev) => (prev === 'rating' ? null : 'rating'))}
+                            className={`px-5 py-2 text-sm font-bold rounded-xl transition-all duration-200 shadow-sm ${sortMode === 'rating'
+                                ? 'bg-blue-600 text-white scale-105 shadow-blue-200'
+                                : 'bg-white text-sky-700 hover:bg-sky-100 border border-transparent'
+                                }`}
+                        >
+                            Rating
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setSortMode((prev) => (prev === 'fees' ? null : 'fees'))}
+                            className={`px-5 py-2 text-sm font-bold rounded-xl transition-all duration-200 shadow-sm ${sortMode === 'fees'
+                                ? 'bg-blue-600 text-white scale-105 shadow-blue-200'
+                                : 'bg-white text-sky-700 hover:bg-sky-100 border border-transparent'
+                                }`}
+                        >
+                            Fees
+                        </button>
+                    </div>
                 </div>
             </div>
+
 
             {/* Main Content - Two Column Layout */}
             <div className="max-w-7xl mx-auto px-8 py-12">
@@ -333,23 +354,21 @@ const UserDashboard = () => {
                                                             <span>
                                                                 {d.name} ({d.specialization})
                                                             </span>
-                                                            {sortMode === 'rating' && (
-                                                                <span className="text-xs font-semibold text-gray-700">
-                                                                    {(() => {
+                                                            <div className="flex flex-col items-end text-xs font-semibold text-gray-700">
+                                                                <span>
+                                                                    Rating: {(() => {
                                                                         const rating = getDoctorRatingValue(d);
                                                                         return rating > 0
                                                                             ? `${rating.toFixed(1)}/10`
                                                                             : 'N/A';
                                                                     })()}
                                                                 </span>
-                                                            )}
-                                                            {sortMode === 'fees' && (
-                                                                <span className="text-xs font-semibold text-gray-700">
-                                                                    {typeof d.consultationFee === 'number'
+                                                                <span>
+                                                                    Fee: {typeof d.consultationFee === 'number'
                                                                         ? `₹${d.consultationFee}`
                                                                         : 'N/A'}
                                                                 </span>
-                                                            )}
+                                                            </div>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -366,23 +385,21 @@ const UserDashboard = () => {
                                                             <span>
                                                                 {s.displayName} [{s.category}]
                                                             </span>
-                                                            {sortMode === 'rating' && (
-                                                                <span className="text-xs font-semibold text-gray-700">
-                                                                    {(() => {
+                                                            <div className="flex flex-col items-end text-xs font-semibold text-gray-700">
+                                                                <span>
+                                                                    Rating: {(() => {
                                                                         const rating = getServiceRatingValue(s);
                                                                         return rating > 0
                                                                             ? `${rating.toFixed(1)}/10`
                                                                             : 'N/A';
                                                                     })()}
                                                                 </span>
-                                                            )}
-                                                            {sortMode === 'fees' && (
-                                                                <span className="text-xs font-semibold text-gray-700">
-                                                                    {typeof s.price === 'number'
+                                                                <span>
+                                                                    Price: {typeof s.price === 'number'
                                                                         ? `₹${s.price}`
                                                                         : 'N/A'}
                                                                 </span>
-                                                            )}
+                                                            </div>
                                                         </div>
                                                     ))}
                                                 </div>
