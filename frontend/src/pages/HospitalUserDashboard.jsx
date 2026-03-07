@@ -27,6 +27,7 @@ const HospitalUserDashboard = () => {
     const [doctorRatingInput, setDoctorRatingInput] = useState(0);
     const [serviceRatingInput, setServiceRatingInput] = useState(0);
     const [submittingDoctorRating, setSubmittingDoctorRating] = useState(false);
+    const [submittingServiceRating, setSubmittingServiceRating] = useState(false);
     const [showDoctorModal, setShowDoctorModal] = useState(false);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
 
@@ -65,32 +66,14 @@ const HospitalUserDashboard = () => {
         }
     }, [hospitalId]);
 
-    // Ensure page opens from the top whenever this dashboard is mounted
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
-
-    // Scroll to section based on URL hash after data loads
-    useEffect(() => {
-        if (doctors.length > 0 || services.length > 0) {
-            const hash = window.location.hash;
-            if (hash) {
-                const element = document.getElementById(hash.substring(1));
-                if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
-                }
-            }
-        }
-    }, [doctors, services]);
-
     return (
         <div className="min-h-screen bg-gray-50">
             <UserNavbar />
 
             {/* Header Section */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
-                <div className="max-w-7xl mx-auto px-8 py-8">
-                    <div className="flex items-start justify-between gap-4">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                         <div>
                             <button
                                 onClick={() => navigate(-1)}
@@ -98,10 +81,10 @@ const HospitalUserDashboard = () => {
                             >
                                 ← Back
                             </button>
-                            <h1 className="text-4xl font-bold">{name || 'Hospital Details'}</h1>
+                            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold break-words">{name || 'Hospital Details'}</h1>
                             <p className="text-blue-100 mt-2">Hospital ID: {hospitalId}</p>
                         </div>
-                        <div className="text-right text-sm text-blue-100 space-y-1">
+                        <div className="text-left md:text-right text-sm text-blue-100 space-y-1">
                             <p>
                                 <span className="font-semibold">Doctor Rating:</span>{' '}
                                 {typeof doctorRating === 'number' ? `${doctorRating.toFixed(1)}/10` : 'Not rated yet'}
@@ -117,16 +100,16 @@ const HospitalUserDashboard = () => {
 
             {/* Error Message */}
             {error && (
-                <div className="max-w-7xl mx-auto px-8 py-4 mt-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 mt-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
                     {error}
                 </div>
             )}
 
             {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-8 py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12">
                 {/* Doctors Section */}
-                <div id="doctors" className="mb-12">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-6">👨‍⚕️ Doctors</h2>
+                <div className="mb-12">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">👨‍⚕️ Doctors</h2>
                     {loadingDoctors ? (
                         <div className="bg-white rounded-lg shadow-md p-12 text-center">
                             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -211,8 +194,8 @@ const HospitalUserDashboard = () => {
                 </div>
 
                 {/* Services Section */}
-                <div id="services">
-                    <h2 className="text-3xl font-bold text-gray-900 mb-6">🏥 Services & Tests</h2>
+                <div>
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">🏥 Services & Tests</h2>
                     {loadingServices ? (
                         <div className="bg-white rounded-lg shadow-md p-12 text-center">
                             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -220,42 +203,44 @@ const HospitalUserDashboard = () => {
                         </div>
                     ) : services.length > 0 ? (
                         <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                            <table className="w-full">
-                                <thead className="bg-blue-600 text-white">
-                                    <tr>
-                                        <th className="px-6 py-4 text-left font-semibold">Service Name</th>
-                                        <th className="px-6 py-4 text-left font-semibold">Category</th>
-                                        <th className="px-6 py-4 text-left font-semibold">LOINC Code</th>
-                                        <th className="px-6 py-4 text-left font-semibold">Price</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {services.map((service, index) => (
-                                        <tr
-                                            key={service._id}
-                                            className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                                                } hover:bg-blue-50 transition border-b`}
-                                        >
-                                            <td className="px-6 py-4 text-gray-900 font-medium">
-                                                {service.displayName || 'N/A'}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
-                                                    {service.category || 'General'}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-gray-700 font-mono text-sm">
-                                                {service.loincCode || 'N/A'}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="font-bold text-blue-600 text-lg">
-                                                    ₹{service.price || '0'}
-                                                </span>
-                                            </td>
+                            <div className="overflow-x-auto">
+                                <table className="min-w-[700px] w-full">
+                                    <thead className="bg-blue-600 text-white">
+                                        <tr>
+                                            <th className="px-6 py-4 text-left font-semibold">Service Name</th>
+                                            <th className="px-6 py-4 text-left font-semibold">Category</th>
+                                            <th className="px-6 py-4 text-left font-semibold">LOINC Code</th>
+                                            <th className="px-6 py-4 text-left font-semibold">Price</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {services.map((service, index) => (
+                                            <tr
+                                                key={service._id}
+                                                className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                                                    } hover:bg-blue-50 transition border-b`}
+                                            >
+                                                <td className="px-6 py-4 text-gray-900 font-medium">
+                                                    {service.displayName || 'N/A'}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                                                        {service.category || 'General'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-gray-700 font-mono text-sm">
+                                                    {service.loincCode || 'N/A'}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className="font-bold text-blue-600 text-lg">
+                                                        ₹{service.price || '0'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     ) : (
                         <div className="bg-white rounded-lg shadow-md p-12 text-center">
@@ -278,8 +263,8 @@ const HospitalUserDashboard = () => {
 
                 {/* Rating Modals */}
                 {showDoctorRatingModal && (
-                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-sm">
                             <h3 className="text-lg font-bold mb-4 text-gray-900">Rate our Doctors</h3>
                             <p className="text-sm text-gray-600 mb-3">Tap a star from 1 to 10.</p>
                             <div className="flex justify-center gap-1 mb-4">
@@ -296,7 +281,7 @@ const HospitalUserDashboard = () => {
                                     </button>
                                 ))}
                             </div>
-                            <div className="flex justify-between items-center mt-4">
+                            <div className="flex flex-col-reverse sm:flex-row justify-between items-center mt-4 gap-2">
                                 <button
                                     type="button"
                                     onClick={() => setShowDoctorRatingModal(false)}
@@ -332,8 +317,8 @@ const HospitalUserDashboard = () => {
                 )}
 
                 {showServiceRatingModal && (
-                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+                    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-sm">
                             <h3 className="text-lg font-bold mb-4 text-gray-900">Rate our Services</h3>
                             <p className="text-sm text-gray-600 mb-3">Tap a star from 1 to 10.</p>
                             <div className="flex justify-center gap-1 mb-4">
@@ -350,7 +335,7 @@ const HospitalUserDashboard = () => {
                                     </button>
                                 ))}
                             </div>
-                            <div className="flex justify-between items-center mt-4">
+                            <div className="flex flex-col-reverse sm:flex-row justify-between items-center mt-4 gap-2">
                                 <button
                                     type="button"
                                     onClick={() => setShowServiceRatingModal(false)}
@@ -386,12 +371,13 @@ const HospitalUserDashboard = () => {
                 )}
 
                 {showDoctorModal && selectedDoctor && (
-                    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+                    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+                        <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-300">
 
                             {/* Header */}
                             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-sky-50/50">
                                 <h3 className="text-xl font-bold text-sky-900">Doctor Profile</h3>
+
                                 <button
                                     onClick={() => setShowDoctorModal(false)}
                                     className="p-2 rounded-full hover:bg-white hover:shadow-sm text-gray-400 hover:text-red-500 transition-all"
@@ -405,8 +391,9 @@ const HospitalUserDashboard = () => {
                             <div className="p-6 overflow-y-auto">
                                 <div className="flex flex-col md:flex-row gap-8">
 
-                                    {/* Column 1: Priority Profile Info */}
+                                    {/* LEFT COLUMN */}
                                     <div className="md:w-1/2 space-y-4">
+
                                         <div className="relative">
                                             {selectedDoctor.photo?.url ? (
                                                 <img
@@ -419,63 +406,97 @@ const HospitalUserDashboard = () => {
                                                     <span className="text-sky-500 font-medium">No Photo Available</span>
                                                 </div>
                                             )}
+
                                             <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold shadow-sm ${selectedDoctor.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                                                 }`}>
                                                 ● {selectedDoctor.isActive ? 'Available' : 'Unavailable'}
                                             </div>
                                         </div>
 
+                                        {/* Fee Card */}
                                         <div className="bg-sky-50 rounded-xl p-4 border border-sky-100">
-                                            <label className="text-xs font-bold text-sky-600 uppercase tracking-wider">Consultation Fee</label>
+                                            <label className="text-xs font-bold text-sky-600 uppercase tracking-wider">
+                                                Consultation Fee
+                                            </label>
+
                                             <p className="text-3xl font-black text-blue-700">
-                                                {typeof selectedDoctor.consultationFee === 'number' ? `₹${selectedDoctor.consultationFee}` : 'N/A'}
+                                                {typeof selectedDoctor.consultationFee === 'number'
+                                                    ? `₹${selectedDoctor.consultationFee}`
+                                                    : 'N/A'}
                                             </p>
-                                            <p className="text-sm text-sky-600/80 mt-1">{selectedDoctor.consultationType || 'General'} Visit</p>
+
+                                            <p className="text-sm text-sky-600/80 mt-1">
+                                                {selectedDoctor.consultationType || 'General'} Visit
+                                            </p>
                                         </div>
+
                                     </div>
 
-                                    {/* Column 2: Professional Details */}
+                                    {/* RIGHT COLUMN */}
                                     <div className="md:w-1/2 space-y-6">
+
                                         <header>
                                             <h4 className="text-2xl font-extrabold text-gray-900 leading-tight">
                                                 {selectedDoctor.name || 'N/A'}
                                             </h4>
+
                                             <p className="text-blue-600 font-semibold text-lg">
                                                 {selectedDoctor.specialization || 'General Physician'}
                                             </p>
+
                                             <div className="flex items-center gap-2 mt-2 text-gray-600 text-sm">
                                                 <span className="bg-gray-100 px-2 py-0.5 rounded italic">
-                                                    {selectedDoctor.experience ? `${selectedDoctor.experience} Years Experience` : 'Exp. N/A'}
+                                                    {selectedDoctor.experience
+                                                        ? `${selectedDoctor.experience} Years Experience`
+                                                        : 'Exp. N/A'}
                                                 </span>
+
                                                 <span>•</span>
+
                                                 <span>{selectedDoctor.gender}</span>
                                             </div>
                                         </header>
 
                                         <div className="space-y-4">
-                                            {/* Qualifications */}
+
+                                            {/* Education */}
                                             <div>
-                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Education</label>
+                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                                    Education
+                                                </label>
+
                                                 <div className="flex flex-wrap gap-2 mt-1">
                                                     {selectedDoctor.qualification?.length > 0 ? (
                                                         selectedDoctor.qualification.map((qual, idx) => (
-                                                            <span key={idx} className="bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded-lg text-xs font-bold">
+                                                            <span
+                                                                key={idx}
+                                                                className="bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded-lg text-xs font-bold"
+                                                            >
                                                                 {qual}
                                                             </span>
                                                         ))
-                                                    ) : <span className="text-gray-400 text-sm">N/A</span>}
+                                                    ) : (
+                                                        <span className="text-gray-400 text-sm">N/A</span>
+                                                    )}
                                                 </div>
                                             </div>
 
-                                            {/* Availability */}
+                                            {/* Schedule */}
                                             <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Schedule</label>
+                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                                    Schedule
+                                                </label>
+
                                                 {selectedDoctor.availability ? (
                                                     <div className="mt-2 space-y-1 text-sm text-gray-700">
+
                                                         <p className="flex justify-between">
                                                             <span className="font-medium">Days:</span>
-                                                            <span className="text-blue-600">{selectedDoctor.availability.days?.join(', ') || 'N/A'}</span>
+                                                            <span className="text-blue-600">
+                                                                {selectedDoctor.availability.days?.join(', ') || 'N/A'}
+                                                            </span>
                                                         </p>
+
                                                         <p className="flex justify-between">
                                                             <span className="font-medium">Hours:</span>
                                                             <span className="text-blue-600">
@@ -484,34 +505,39 @@ const HospitalUserDashboard = () => {
                                                                     : 'Not specified'}
                                                             </span>
                                                         </p>
+
                                                     </div>
-                                                ) : <p className="text-gray-400 text-sm">Not specified</p>}
+                                                ) : (
+                                                    <p className="text-gray-400 text-sm">Not specified</p>
+                                                )}
                                             </div>
 
-                                            {/* Bio */}
+                                            {/* About */}
                                             <div>
-                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">About Doctor</label>
+                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                                    About Doctor
+                                                </label>
+
                                                 <p className="text-sm text-gray-600 mt-1 leading-relaxed italic">
                                                     "{selectedDoctor.description || 'No description provided.'}"
                                                 </p>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Footer Action */}
+                            {/* Footer */}
                             <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3">
-                                <label className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-blue-100">
-
-                                </label>
                                 <button
                                     onClick={() => setShowDoctorModal(false)}
-                                    className="px-6 py-3 border border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-100"
+                                    className="ml-auto px-6 py-3 border border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-100"
                                 >
                                     Close
                                 </button>
                             </div>
+
                         </div>
                     </div>
                 )}
