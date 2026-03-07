@@ -5,24 +5,17 @@ import {
   STORAGE_KEYS,
 } from "../utils/constants";
 
-// Function to check if local backend is available
-const checkLocalBackend = async () => {
-  try {
-    await axios.get(`${LOCAL_API_URL}/health`, { timeout: 2000 });
-    return true;
-  } catch (error) {
-    return false;
-  }
-};
+// Determine base URL based on environment
+// In production (Vercel), use the remote API
+// In development, use localhost
+const isProduction =
+  import.meta.env.PROD || import.meta.env.MODE === "production";
+const baseURL = isProduction
+  ? REMOTE_API_URL
+  : import.meta.env.VITE_API_URL || LOCAL_API_URL;
 
-// Determine which backend to use
-let baseURL = LOCAL_API_URL;
-const isLocalAvailable = await checkLocalBackend();
-
-if (!isLocalAvailable) {
-  baseURL = REMOTE_API_URL;
-} else {
-}
+console.log("API Base URL:", baseURL);
+console.log("Environment:", import.meta.env.MODE);
 
 const apiClient = axios.create({
   baseURL: baseURL,
