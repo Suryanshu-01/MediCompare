@@ -59,12 +59,13 @@ const UserDashboard = () => {
             console.warn('Hospital not found for doctor', doctor);
             return;
         }
-        navigate(`/hospital/${hospital._id}#doctors`, {
+        navigate(`/hospital/${hospital._id}`, {
             state: {
                 name: hospital.name,
                 lng: hospital.lng,
                 lat: hospital.lat,
-                hospitalId: hospital._id
+                hospitalId: hospital._id,
+                selectedDoctorId: doctor._id
             }
         });
     };

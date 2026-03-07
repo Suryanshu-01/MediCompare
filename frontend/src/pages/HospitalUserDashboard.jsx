@@ -12,7 +12,7 @@ const HospitalUserDashboard = () => {
 
     // Get hospital data from location state
     const hospitalData = location.state || {};
-    const { name } = hospitalData;
+    const { name, selectedDoctorId } = hospitalData;
 
     // States
     const [doctors, setDoctors] = useState([]);
@@ -66,6 +66,30 @@ const HospitalUserDashboard = () => {
         }
     }, [hospitalId]);
 
+    // Auto-open doctor modal if selectedDoctorId is provided
+    useEffect(() => {
+        if (selectedDoctorId && doctors.length > 0 && !loadingDoctors) {
+            const doctor = doctors.find(d => d._id === selectedDoctorId);
+            if (doctor) {
+                setSelectedDoctor(doctor);
+                setShowDoctorModal(true);
+            }
+        }
+    }, [selectedDoctorId, doctors, loadingDoctors]);
+
+    // Scroll to section based on URL hash after data loads
+    useEffect(() => {
+        if (doctors.length > 0 || services.length > 0) {
+            const hash = window.location.hash;
+            if (hash) {
+                const element = document.getElementById(hash.substring(1));
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        }
+    }, [doctors, services]);
+
     return (
         <div className="min-h-screen bg-gray-50">
             <UserNavbar />
@@ -108,7 +132,7 @@ const HospitalUserDashboard = () => {
             {/* Main Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12">
                 {/* Doctors Section */}
-                <div className="mb-12">
+                <div id="doctors" className="mb-12">
                     <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">👨‍⚕️ Doctors</h2>
                     {loadingDoctors ? (
                         <div className="bg-white rounded-lg shadow-md p-12 text-center">
@@ -194,7 +218,7 @@ const HospitalUserDashboard = () => {
                 </div>
 
                 {/* Services Section */}
-                <div>
+                <div id="services">
                     <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">🏥 Services & Tests</h2>
                     {loadingServices ? (
                         <div className="bg-white rounded-lg shadow-md p-12 text-center">
