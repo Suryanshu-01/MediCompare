@@ -27,7 +27,8 @@ const HospitalUserDashboard = () => {
     const [doctorRatingInput, setDoctorRatingInput] = useState(0);
     const [serviceRatingInput, setServiceRatingInput] = useState(0);
     const [submittingDoctorRating, setSubmittingDoctorRating] = useState(false);
-    const [submittingServiceRating, setSubmittingServiceRating] = useState(false);
+    const [showDoctorModal, setShowDoctorModal] = useState(false);
+    const [selectedDoctor, setSelectedDoctor] = useState(null);
 
     // Fetch doctors and services on component mount
     useEffect(() => {
@@ -134,7 +135,14 @@ const HospitalUserDashboard = () => {
                     ) : doctors.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {doctors.map((doctor) => (
-                                <div key={doctor._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                                <div
+                                    key={doctor._id}
+                                    onClick={() => {
+                                        setSelectedDoctor(doctor);
+                                        setShowDoctorModal(true);
+                                    }}
+                                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer"
+                                >
                                     {/* Doctor Photo */}
                                     {doctor.photo && doctor.photo.url && (
                                         <img
@@ -177,43 +185,8 @@ const HospitalUserDashboard = () => {
                                             )}
                                         </div>
 
-                                        {/* Qualifications */}
-                                        {doctor.qualification && doctor.qualification.length > 0 && (
-                                            <div className="mb-4">
-                                                <p className="font-semibold text-gray-700 mb-2">🎓 Qualifications:</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {doctor.qualification.map((qual, idx) => (
-                                                        <span
-                                                            key={idx}
-                                                            className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs"
-                                                        >
-                                                            {qual}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Availability */}
-                                        {doctor.availability && (
-                                            <div className="bg-green-50 rounded-lg p-3">
-                                                <p className="font-semibold text-gray-700 text-sm mb-2">⏰ Availability</p>
-                                                <div className="text-xs text-gray-600 space-y-1">
-                                                    <p>
-                                                        <span className="font-semibold">Days:</span>{' '}
-                                                        {doctor.availability.days?.join(', ') || 'Not specified'}
-                                                    </p>
-                                                    <p>
-                                                        <span className="font-semibold">Time:</span>{' '}
-                                                        {doctor.availability.timeSlots && doctor.availability.timeSlots.length > 0
-                                                            ? doctor.availability.timeSlots
-                                                                .map((slot) => `${slot.start} - ${slot.end}`)
-                                                                .join(', ')
-                                                            : 'Not specified'}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        )}
+                                        {/* Click for more info */}
+                                        <p className="text-right text-sm text-blue-600">Click for more info</p>
                                     </div>
                                 </div>
                             ))}
@@ -406,6 +379,137 @@ const HospitalUserDashboard = () => {
                                     className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-50"
                                 >
                                     {submittingServiceRating ? 'Submitting...' : 'Submit Rating'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {showDoctorModal && selectedDoctor && (
+                    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+
+                            {/* Header */}
+                            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-sky-50/50">
+                                <h3 className="text-xl font-bold text-sky-900">Doctor Profile</h3>
+                                <button
+                                    onClick={() => setShowDoctorModal(false)}
+                                    className="p-2 rounded-full hover:bg-white hover:shadow-sm text-gray-400 hover:text-red-500 transition-all"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div className="p-6 overflow-y-auto">
+                                <div className="flex flex-col md:flex-row gap-8">
+
+                                    {/* Column 1: Priority Profile Info */}
+                                    <div className="md:w-1/2 space-y-4">
+                                        <div className="relative">
+                                            {selectedDoctor.photo?.url ? (
+                                                <img
+                                                    src={selectedDoctor.photo.url}
+                                                    alt={selectedDoctor.name}
+                                                    className="w-full h-72 object-cover rounded-2xl shadow-md border-4 border-white"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-72 bg-sky-100 rounded-2xl flex items-center justify-center border-2 border-dashed border-sky-200">
+                                                    <span className="text-sky-500 font-medium">No Photo Available</span>
+                                                </div>
+                                            )}
+                                            <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold shadow-sm ${selectedDoctor.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                                }`}>
+                                                ● {selectedDoctor.isActive ? 'Available' : 'Unavailable'}
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-sky-50 rounded-xl p-4 border border-sky-100">
+                                            <label className="text-xs font-bold text-sky-600 uppercase tracking-wider">Consultation Fee</label>
+                                            <p className="text-3xl font-black text-blue-700">
+                                                {typeof selectedDoctor.consultationFee === 'number' ? `₹${selectedDoctor.consultationFee}` : 'N/A'}
+                                            </p>
+                                            <p className="text-sm text-sky-600/80 mt-1">{selectedDoctor.consultationType || 'General'} Visit</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Column 2: Professional Details */}
+                                    <div className="md:w-1/2 space-y-6">
+                                        <header>
+                                            <h4 className="text-2xl font-extrabold text-gray-900 leading-tight">
+                                                {selectedDoctor.name || 'N/A'}
+                                            </h4>
+                                            <p className="text-blue-600 font-semibold text-lg">
+                                                {selectedDoctor.specialization || 'General Physician'}
+                                            </p>
+                                            <div className="flex items-center gap-2 mt-2 text-gray-600 text-sm">
+                                                <span className="bg-gray-100 px-2 py-0.5 rounded italic">
+                                                    {selectedDoctor.experience ? `${selectedDoctor.experience} Years Experience` : 'Exp. N/A'}
+                                                </span>
+                                                <span>•</span>
+                                                <span>{selectedDoctor.gender}</span>
+                                            </div>
+                                        </header>
+
+                                        <div className="space-y-4">
+                                            {/* Qualifications */}
+                                            <div>
+                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Education</label>
+                                                <div className="flex flex-wrap gap-2 mt-1">
+                                                    {selectedDoctor.qualification?.length > 0 ? (
+                                                        selectedDoctor.qualification.map((qual, idx) => (
+                                                            <span key={idx} className="bg-white border border-blue-200 text-blue-700 px-3 py-1 rounded-lg text-xs font-bold">
+                                                                {qual}
+                                                            </span>
+                                                        ))
+                                                    ) : <span className="text-gray-400 text-sm">N/A</span>}
+                                                </div>
+                                            </div>
+
+                                            {/* Availability */}
+                                            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Schedule</label>
+                                                {selectedDoctor.availability ? (
+                                                    <div className="mt-2 space-y-1 text-sm text-gray-700">
+                                                        <p className="flex justify-between">
+                                                            <span className="font-medium">Days:</span>
+                                                            <span className="text-blue-600">{selectedDoctor.availability.days?.join(', ') || 'N/A'}</span>
+                                                        </p>
+                                                        <p className="flex justify-between">
+                                                            <span className="font-medium">Hours:</span>
+                                                            <span className="text-blue-600">
+                                                                {selectedDoctor.availability.timeSlots?.[0]
+                                                                    ? `${selectedDoctor.availability.timeSlots[0].start} - ${selectedDoctor.availability.timeSlots[0].end}`
+                                                                    : 'Not specified'}
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                ) : <p className="text-gray-400 text-sm">Not specified</p>}
+                                            </div>
+
+                                            {/* Bio */}
+                                            <div>
+                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">About Doctor</label>
+                                                <p className="text-sm text-gray-600 mt-1 leading-relaxed italic">
+                                                    "{selectedDoctor.description || 'No description provided.'}"
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Footer Action */}
+                            <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3">
+                                <label className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-blue-100">
+
+                                </label>
+                                <button
+                                    onClick={() => setShowDoctorModal(false)}
+                                    className="px-6 py-3 border border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-100"
+                                >
+                                    Close
                                 </button>
                             </div>
                         </div>
