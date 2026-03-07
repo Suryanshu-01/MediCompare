@@ -64,6 +64,24 @@ const HospitalUserDashboard = () => {
         }
     }, [hospitalId]);
 
+    // Ensure page opens from the top whenever this dashboard is mounted
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
+    // Scroll to section based on URL hash after data loads
+    useEffect(() => {
+        if (doctors.length > 0 || services.length > 0) {
+            const hash = window.location.hash;
+            if (hash) {
+                const element = document.getElementById(hash.substring(1));
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        }
+    }, [doctors, services]);
+
     return (
         <div className="min-h-screen bg-gray-50">
             <UserNavbar />
@@ -106,7 +124,7 @@ const HospitalUserDashboard = () => {
             {/* Main Content */}
             <div className="max-w-7xl mx-auto px-8 py-12">
                 {/* Doctors Section */}
-                <div className="mb-12">
+                <div id="doctors" className="mb-12">
                     <h2 className="text-3xl font-bold text-gray-900 mb-6">👨‍⚕️ Doctors</h2>
                     {loadingDoctors ? (
                         <div className="bg-white rounded-lg shadow-md p-12 text-center">
@@ -220,7 +238,7 @@ const HospitalUserDashboard = () => {
                 </div>
 
                 {/* Services Section */}
-                <div>
+                <div id="services">
                     <h2 className="text-3xl font-bold text-gray-900 mb-6">🏥 Services & Tests</h2>
                     {loadingServices ? (
                         <div className="bg-white rounded-lg shadow-md p-12 text-center">
@@ -242,9 +260,8 @@ const HospitalUserDashboard = () => {
                                     {services.map((service, index) => (
                                         <tr
                                             key={service._id}
-                                            className={`${
-                                                index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                                            } hover:bg-blue-50 transition border-b`}
+                                            className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                                                } hover:bg-blue-50 transition border-b`}
                                         >
                                             <td className="px-6 py-4 text-gray-900 font-medium">
                                                 {service.displayName || 'N/A'}
