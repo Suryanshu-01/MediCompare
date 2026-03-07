@@ -1,6 +1,3 @@
-// ==========================================
-// HOSPITAL SERVICES PAGE
-// ==========================================
 
 import { useEffect, useMemo, useState } from "react";
 import HospitalNavbar from "../components/layout/HospitalNavbar";
@@ -11,13 +8,11 @@ const MIN_QUERY_LENGTH = 2;
 
 export default function HospitalServices() {
 
-  // ---------------- STATE ----------------
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Add form state
   const [category, setCategory] = useState("");
   const [loincQuery, setLoincQuery] = useState("");
   const [loincResults, setLoincResults] = useState([]);
@@ -26,7 +21,6 @@ export default function HospitalServices() {
   const [price, setPrice] = useState("");
   const [formErrors, setFormErrors] = useState({});
 
-  // ---------------- FETCH SERVICES ----------------
   const fetchServices = async () => {
     try {
       setLoading(true);
@@ -43,7 +37,6 @@ export default function HospitalServices() {
     fetchServices();
   }, []);
 
-  // ---------------- LOINC SEARCH ----------------
   useEffect(() => {
     if (!category || loincQuery.trim().length < MIN_QUERY_LENGTH) {
       setLoincResults([]);
@@ -68,12 +61,11 @@ export default function HospitalServices() {
     return () => clearTimeout(timeout);
   }, [loincQuery, category]);
 
-  // ---------------- HELPERS ----------------
   const resetForm = () => {
     setCategory("");
     setLoincQuery("");
-    setLoincResults([]);
     setSelectedLoinc(null);
+    setLoincResults([]);
     setPrice("");
     setFormErrors({});
   };
@@ -81,17 +73,14 @@ export default function HospitalServices() {
   const validateForm = () => {
     const errors = {};
 
-    if (!category) errors.category = "Category is required";
-    if (!selectedLoinc)
-      errors.loinc = "Please select a test from suggestions";
-    if (price === "" || Number(price) < 0)
-      errors.price = "Invalid price";
+    if (!category) errors.category = "Category required";
+    if (!selectedLoinc) errors.loinc = "Select a test";
+    if (price === "" || Number(price) < 0) errors.price = "Invalid price";
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  // ---------------- CREATE SERVICE ----------------
   const handleCreate = async (e) => {
     e.preventDefault();
     setApiError("");
@@ -115,7 +104,6 @@ export default function HospitalServices() {
     }
   };
 
-  // ---------------- DELETE SERVICE ----------------
   const handleDelete = async (id) => {
     try {
       await servicesService.deleteService(id);
@@ -130,65 +118,66 @@ export default function HospitalServices() {
     return `${selectedLoinc.displayName} (${selectedLoinc.loincCode})`;
   }, [selectedLoinc]);
 
-  // ---------------- UI ----------------
   return (
     <>
       <HospitalNavbar />
 
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-5xl mx-auto">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-100">
 
-          {/* SUCCESS MESSAGE */}
+        <div className="max-w-7xl mx-auto px-6 py-10">
+
           {successMessage && (
-            <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">
+            <div className="mb-6 bg-green-100 text-green-700 px-4 py-3 rounded-lg">
               {successMessage}
             </div>
           )}
 
-          {/* ERROR MESSAGE */}
           {apiError && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+            <div className="mb-6 bg-red-100 text-red-700 px-4 py-3 rounded-lg">
               {apiError}
             </div>
           )}
 
-          {/* ================= ADD SERVICE ================= */}
-          <div className="bg-white p-6 rounded shadow mb-8">
-            <h2 className="text-xl font-semibold mb-4">Add Service</h2>
+          {/* ADD SERVICE CARD */}
+          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm mb-10">
 
-            <form onSubmit={handleCreate} className="space-y-4">
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+              Add New Service
+            </h2>
 
-              {/* CATEGORY */}
+            <form onSubmit={handleCreate} className="space-y-5">
+
               <div>
-                <label className="block text-sm font-medium">
-                  Category *
+                <label className="block text-sm font-medium mb-1">
+                  Category
                 </label>
+
                 <select
                   value={category}
                   onChange={(e) => {
                     setCategory(e.target.value);
                     setLoincQuery("");
                     setSelectedLoinc(null);
-                    setLoincResults([]);
                   }}
-                  className="w-full border px-3 py-2 rounded"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 >
                   <option value="">Select category</option>
                   <option value="BLOOD_TEST">Blood Test</option>
                   <option value="URINE_TEST">Urine Test</option>
                   <option value="IMAGING">Imaging</option>
                 </select>
+
                 {formErrors.category && (
-                  <p className="text-red-500 text-sm">
+                  <p className="text-red-500 text-sm mt-1">
                     {formErrors.category}
                   </p>
                 )}
               </div>
 
-              {/* LOINC SEARCH */}
-              <div>
-                <label className="block text-sm font-medium">
-                  Search Test *
+              <div className="relative">
+
+                <label className="block text-sm font-medium mb-1">
+                  Search Test
                 </label>
 
                 <input
@@ -200,19 +189,20 @@ export default function HospitalServices() {
                     setSelectedLoinc(null);
                   }}
                   placeholder={
-                    category ? "Type test name" : "Select category first"
+                    category ? "Search medical test..." : "Select category first"
                   }
-                  className="w-full border px-3 py-2 rounded"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
 
                 {loincLoading && (
                   <p className="text-sm text-gray-500 mt-1">
-                    Searching...
+                    Searching tests...
                   </p>
                 )}
 
                 {loincResults.length > 0 && (
-                  <div className="border mt-2 rounded bg-white max-h-60 overflow-y-auto">
+                  <div className="absolute z-20 w-full bg-white border border-gray-200 rounded-lg shadow mt-2 max-h-60 overflow-y-auto">
+
                     {loincResults.map((item) => (
                       <button
                         key={item.loincCode}
@@ -222,16 +212,18 @@ export default function HospitalServices() {
                           setLoincQuery(item.displayName);
                           setLoincResults([]);
                         }}
-                        className="w-full text-left px-3 py-2 hover:bg-blue-50"
+                        className="w-full text-left px-4 py-3 hover:bg-blue-50"
                       >
                         <div className="font-medium">
                           {item.displayName}
                         </div>
+
                         <div className="text-xs text-gray-500">
                           {item.loincCode}
                         </div>
                       </button>
                     ))}
+
                   </div>
                 )}
 
@@ -248,71 +240,92 @@ export default function HospitalServices() {
                 )}
               </div>
 
-              {/* PRICE */}
               <div>
-                <label className="block text-sm font-medium">
-                  Price *
+                <label className="block text-sm font-medium mb-1">
+                  Price
                 </label>
+
                 <input
                   type="number"
                   min="0"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
-                  className="w-full border px-3 py-2 rounded"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 />
+
                 {formErrors.price && (
-                  <p className="text-red-500 text-sm">
+                  <p className="text-red-500 text-sm mt-1">
                     {formErrors.price}
                   </p>
                 )}
               </div>
 
-              <button className="bg-blue-600 text-white px-4 py-2 rounded">
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-medium">
                 Add Service
               </button>
+
             </form>
           </div>
 
-          {/* ================= SERVICES LIST ================= */}
-          <div className="bg-white p-6 rounded shadow">
-            <h2 className="text-xl font-semibold mb-4">
+          {/* SERVICES LIST */}
+          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">
               Your Services
             </h2>
 
             {loading && (
-              <p className="text-gray-500">
-                Loading services...
-              </p>
+              <p className="text-gray-500">Loading services...</p>
             )}
 
             {!loading && services.length === 0 && (
-              <p className="text-gray-500">
-                No services added yet.
-              </p>
+              <p className="text-gray-500">No services added yet.</p>
             )}
 
-            {!loading &&
-              services.map((service) => (
-                <div
-                  key={service._id}
-                  className="flex justify-between border-b py-3"
-                >
-                  <div>
-                    <div className="font-medium">
-                      {service.displayName}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {service.loincCode}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleDelete(service._id)}
-                    className="text-red-600 text-sm"
+            {!loading && services.length > 0 && (
+
+              <div className="divide-y">
+
+                {services.map((service) => (
+
+                  <div
+                    key={service._id}
+                    className="flex justify-between items-center py-4"
                   >
-                    Delete
-                  </button>
-                </div>
-              ))}
+
+                    <div>
+                      <div className="font-medium text-gray-900">
+                        {service.displayName}
+                      </div>
+
+                      <div className="text-sm text-gray-500">
+                        {service.loincCode}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+
+                      <span className="text-sm font-medium text-gray-700">
+                        ₹{service.price}
+                      </span>
+
+                      <button
+                        onClick={() => handleDelete(service._id)}
+                        className="text-red-600 hover:text-red-700 text-sm font-medium"
+                      >
+                        Delete
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                ))}
+
+              </div>
+
+            )}
+
           </div>
 
         </div>

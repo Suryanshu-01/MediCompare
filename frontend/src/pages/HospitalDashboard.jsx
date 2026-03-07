@@ -1,26 +1,26 @@
 
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import doctorService from "../services/doctor.service";
+import HospitalNavbar from "../components/layout/HospitalNavbar";
 
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import doctorService from '../services/doctor.service';
-import HospitalNavbar from '../components/layout/HospitalNavbar';
+import { Plus, Users, Activity, ShieldCheck } from "lucide-react";
 
 export default function HospitalDashboard() {
   const navigate = useNavigate();
   const { hospital, user } = useAuth();
-  
+
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch doctors on mount
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
         const response = await doctorService.getDoctors();
         setDoctors(response.data || response);
       } catch (error) {
-        console.error('Failed to fetch doctors:', error);
+        console.error("Failed to fetch doctors:", error);
       } finally {
         setLoading(false);
       }
@@ -29,189 +29,253 @@ export default function HospitalDashboard() {
     fetchDoctors();
   }, []);
 
-  // Calculate stats
   const totalDoctors = doctors.length;
-  // A doctor is "active" if they have availability configured (days and time slots)
-  const activeDoctors = doctors.filter(d => 
-    d.availability?.days?.length > 0 && 
-    d.availability?.timeSlots?.length > 0
+
+  const activeDoctors = doctors.filter(
+    (d) =>
+      d.availability?.days?.length > 0 &&
+      d.availability?.timeSlots?.length > 0
   ).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-100">
+
       <HospitalNavbar />
-      
-      {/* Header Section */}
-      <div className="bg-white shadow">
-        <div className="max-w-6xl mx-auto px-8 py-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Welcome to {hospital?.hospitalName || 'Hospital'} Dashboard
-            </h1>
-            <p className="text-gray-600 mt-1">Manage your hospital and doctors</p>
-          </div>
+
+      {/* HEADER */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+            Welcome to {hospital?.hospitalName || "Hospital"} Dashboard
+          </h1>
+
+          <p className="text-gray-500 mt-1">
+            Manage your hospital, doctors and services
+          </p>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-8 py-12">
-        {/* Quick Actions */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+      {/* CONTENT */}
+      <div className="max-w-7xl mx-auto px-6 py-10">
+
+        {/* QUICK ACTIONS */}
+        <section className="mb-12 pb-10 border-b border-gray-200">
+
+          <h2 className="text-xl font-semibold text-gray-800 mb-6">
+            Quick Actions
+          </h2>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Add Doctor Card */}
-            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-              <div className="flex items-start space-x-4">
-                <div className="bg-blue-100 rounded-full p-3">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
+
+            {/* ADD DOCTOR */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+
+              <div className="flex gap-4">
+
+                <div className="bg-blue-100 p-3 rounded-xl">
+                  <Plus className="text-blue-600" size={26} />
                 </div>
+
                 <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Add New Doctor</h3>
-                  <p className="text-gray-600 mb-4">
-                    Register a new doctor to your hospital profile with their qualifications and availability
+
+                  <h3 className="font-semibold text-gray-900 mb-1">
+                    Add New Doctor
+                  </h3>
+
+                  <p className="text-sm text-gray-500 mb-4">
+                    Register a new doctor with qualifications and availability.
                   </p>
+
                   <button
-                    onClick={() => navigate('/hospital/doctors/add')}
-                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                    onClick={() => navigate("/hospital/doctors/add")}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
                   >
                     Add Doctor
                   </button>
+
                 </div>
               </div>
             </div>
 
-            {/* View All Doctors Card */}
-            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-              <div className="flex items-start space-x-4">
-                <div className="bg-green-100 rounded-full p-3">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
+            {/* MANAGE DOCTORS */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+
+              <div className="flex gap-4">
+
+                <div className="bg-green-100 p-3 rounded-xl">
+                  <Users className="text-green-600" size={26} />
                 </div>
+
                 <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Manage Doctors</h3>
-                  <p className="text-gray-600 mb-4">
-                    View, edit, and manage all doctors registered under your hospital
+
+                  <h3 className="font-semibold text-gray-900 mb-1">
+                    Manage Doctors
+                  </h3>
+
+                  <p className="text-sm text-gray-500 mb-4">
+                    View and manage all doctors registered under your hospital.
                   </p>
+
                   <button
-                    onClick={() => navigate('/hospital/doctors')}
-                    className="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition"
+                    onClick={() => navigate("/hospital/doctors")}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
                   >
-                    View All Doctors
+                    View Doctors
                   </button>
+
                 </div>
               </div>
             </div>
 
-            {/* Add Service Card */}
-            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-              <div className="flex items-start space-x-4">
-                <div className="bg-purple-100 rounded-full p-3">
-                  <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                  </svg>
+            {/* ADD SERVICE */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+
+              <div className="flex gap-4">
+
+                <div className="bg-purple-100 p-3 rounded-xl">
+                  <Activity className="text-purple-600" size={26} />
                 </div>
+
                 <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Add New Service</h3>
-                  <p className="text-gray-600 mb-4">
-                    Add a new test/service with LOINC suggestions to avoid spelling mistakes
+
+                  <h3 className="font-semibold text-gray-900 mb-1">
+                    Add New Service
+                  </h3>
+
+                  <p className="text-sm text-gray-500 mb-4">
+                    Add hospital tests with LOINC suggestions.
                   </p>
+
                   <button
-                    onClick={() => navigate('/hospital/services/add')}
-                    className="bg-purple-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"
+                    onClick={() => navigate("/hospital/services/add")}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
                   >
                     Add Service
                   </button>
+
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Stats Overview */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Overview</h2>
+          </div>
+        </section>
+
+        {/* OVERVIEW */}
+        <section className="mb-12 pb-10 border-b border-gray-200">
+
+          <h2 className="text-xl font-semibold text-gray-800 mb-6">
+            Overview
+          </h2>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Total Doctors */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between">
+
+            {/* TOTAL DOCTORS */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+
+              <div className="flex justify-between items-center">
+
                 <div>
-                  <p className="text-gray-600 text-sm">Total Doctors</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
-                    {loading ? '...' : totalDoctors}
+                  <p className="text-sm text-gray-500">Total Doctors</p>
+
+                  <p className="text-3xl font-bold text-gray-900 tracking-tight mt-1">
+                    {loading ? "..." : totalDoctors}
                   </p>
                 </div>
-                <div className="bg-blue-100 rounded-full p-3">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+
+                <div className="bg-blue-100 p-3 rounded-xl">
+                  <Users className="text-blue-600" size={22} />
                 </div>
+
               </div>
             </div>
 
-            {/* Active Doctors */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between">
+            {/* ACTIVE DOCTORS */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+
+              <div className="flex justify-between items-center">
+
                 <div>
-                  <p className="text-gray-600 text-sm">Active Doctors</p>
-                  <p className="text-3xl font-bold text-green-600 mt-2">
-                    {loading ? '...' : activeDoctors}
+                  <p className="text-sm text-gray-500">Active Doctors</p>
+
+                  <p className="text-3xl font-bold text-green-600 tracking-tight mt-1">
+                    {loading ? "..." : activeDoctors}
                   </p>
                 </div>
-                <div className="bg-green-100 rounded-full p-3">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+
+                <div className="bg-green-100 p-3 rounded-xl">
+                  <Activity className="text-green-600" size={22} />
                 </div>
+
               </div>
             </div>
 
-            {/* Hospital Status */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between">
+            {/* STATUS */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+
+              <div className="flex justify-between items-center">
+
                 <div>
-                  <p className="text-gray-600 text-sm">Hospital Status</p>
-                  <p className="text-xl font-bold text-green-600 mt-2">
-                    {hospital?.status || 'VERIFIED'}
+                  <p className="text-sm text-gray-500">Hospital Status</p>
+
+                  <p className="text-xl font-bold text-green-600 mt-1">
+                    {hospital?.status || "VERIFIED"}
                   </p>
                 </div>
-                <div className="bg-green-100 rounded-full p-3">
-                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
+
+                <div className="bg-green-100 p-3 rounded-xl">
+                  <ShieldCheck className="text-green-600" size={22} />
                 </div>
+
               </div>
             </div>
+
           </div>
-        </div>
+        </section>
 
-        {/* Hospital Info */}
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Hospital Information</h2>
-          <div className="bg-white rounded-lg shadow p-6">
+        {/* HOSPITAL INFO */}
+        <section>
+
+          <h2 className="text-xl font-semibold text-gray-800 mb-6">
+            Hospital Information
+          </h2>
+
+          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
               <div>
-                <p className="text-sm text-gray-600">Hospital Name</p>
-                <p className="text-lg font-semibold text-gray-900 mt-1">{hospital?.hospitalName || 'N/A'}</p>
+                <p className="text-sm text-gray-500">Hospital Name</p>
+                <p className="font-semibold text-gray-900">
+                  {hospital?.hospitalName || "N/A"}
+                </p>
               </div>
+
               <div>
-                <p className="text-sm text-gray-600">Email</p>
-                <p className="text-lg font-semibold text-gray-900 mt-1">{hospital?.email || user?.email || 'N/A'}</p>
+                <p className="text-sm text-gray-500">Email</p>
+                <p className="font-semibold text-gray-900">
+                  {hospital?.email || user?.email || "N/A"}
+                </p>
               </div>
+
               <div>
-                <p className="text-sm text-gray-600">Phone</p>
-                <p className="text-lg font-semibold text-gray-900 mt-1">{hospital?.phone || 'N/A'}</p>
+                <p className="text-sm text-gray-500">Phone</p>
+                <p className="font-semibold text-gray-900">
+                  {hospital?.phone || "N/A"}
+                </p>
               </div>
+
               <div>
-                <p className="text-sm text-gray-600">Address</p>
-                <p className="text-lg font-semibold text-gray-900 mt-1">{hospital?.address || 'N/A'}</p>
+                <p className="text-sm text-gray-500">Address</p>
+                <p className="font-semibold text-gray-900">
+                  {hospital?.address || "N/A"}
+                </p>
               </div>
-              
+
             </div>
+
           </div>
-        </div>
+        </section>
+
       </div>
     </div>
   );

@@ -16,7 +16,7 @@ import UserDashboard from './pages/UserDashboard';
 import HospitalUserDashboard from './pages/HospitalUserDashboard';
 import HospitalList from './pages/HospitalList';
 import ServicesList from './pages/hospital/Services/ServicesList';
-import AddService from './pages/hospital/Services/AddService';
+import AddService from './pages/AddService';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminRejectedHospitals from './pages/AdminRejectedHospitals';
 

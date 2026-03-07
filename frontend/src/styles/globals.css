@@ -1,26 +1,128 @@
-/* ==========================================
-   GLOBALS.CSS
-   ==========================================
-   - Import Tailwind utilities
-   - Base global styles
-   - Custom CSS variables (optional)
-*/
 
-/* Import Tailwind CSS */
 @import "tailwindcss";
 
-/* Optional: Custom global styles */
+/* ==========================================
+   CSS VARIABLES (COLOR SYSTEM)
+   ========================================== */
+
+:root {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+
+  --success: #22c55e;
+  --danger: #ef4444;
+
+  --bg-page: #f9fafb;
+  --bg-card: #ffffff;
+
+  --border: #e5e7eb;
+
+  --text-main: #111827;
+  --text-muted: #6b7280;
+}
+
+/* ==========================================
+   BASE GLOBAL STYLES
+   ========================================== */
+
 html {
   scroll-behavior: smooth;
 }
 
 body {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  min-height: 100vh;
   @apply antialiased;
 }
 
-/* Remove default input styling for better control */
+/* ==========================================
+   PAGE CONTAINER
+   ========================================== */
+
+.page-container {
+  @apply max-w-7xl mx-auto px-6 py-8;
+}
+
+/* ==========================================
+   CARD SYSTEM
+   ========================================== */
+
+.card {
+  @apply bg-white border border-gray-200 rounded-xl shadow-sm p-6;
+}
+
+.card-hover {
+  @apply bg-white border border-gray-200 rounded-xl shadow-sm p-6 transition hover:shadow-md;
+}
+
+/* ==========================================
+   BUTTON SYSTEM
+   ========================================== */
+
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition;
+}
+
+.btn-danger {
+  @apply bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition;
+}
+
+/* ==========================================
+   INPUT SYSTEM
+   ========================================== */
+
+.input-field {
+  @apply border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none;
+}
+
+/* ==========================================
+   TABLE SYSTEM
+   ========================================== */
+
+.table-container {
+  @apply bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden;
+}
+
+.table-header {
+  @apply bg-gray-50 text-xs font-semibold text-gray-500 uppercase;
+}
+
+.table-row {
+  @apply hover:bg-gray-50 transition;
+}
+
+/* ==========================================
+   SECTION TITLES
+   ========================================== */
+
+.page-title {
+  @apply text-3xl font-bold text-gray-900;
+}
+
+.section-title {
+  @apply text-xl font-semibold text-gray-800;
+}
+
+.section-subtitle {
+  @apply text-sm text-gray-500;
+}
+
+/* ==========================================
+   FORM DEFAULTS
+   ========================================== */
+
 input,
 textarea,
 select {
   @apply w-full;
+}
+
+button {
+  font: inherit;
 }

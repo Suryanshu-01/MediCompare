@@ -5,84 +5,98 @@ import loincService from "../../services/loinc.service";
 const MIN_QUERY_LENGTH = 2;
 
 export default function LoincSearchInput({ value, onChange, onSelect, error, category }) {
-  const [results,setResults]=useState([]);
-  const [loading,setLoading]=useState(false);
-  const [requestError,setRequestError]=useState("");
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [requestError, setRequestError] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const debouncedQuery = useDebounce(value,400);
+  const debouncedQuery = useDebounce(value, 400);
 
-  useEffect(()=>{
-    let active=true;
+  useEffect(() => {
+    let active = true;
 
-    if (!category || debouncedQuery.trim().length < MIN_QUERY_LENGTH){
+    if (!category || debouncedQuery.trim().length < MIN_QUERY_LENGTH) {
       setResults([]);
       setRequestError("");
       return;
     }
 
-    const fetch=async()=>{
-      try{
+    const fetch = async () => {
+      try {
         setLoading(true);
         setRequestError("");
-        const data = await loincService.searchLoincTests(debouncedQuery.trim(),category);
-        if(active) {
+
+        const data = await loincService.searchLoincTests(
+          debouncedQuery.trim(),
+          category
+        );
+
+        if (active) {
           setResults(Array.isArray(data) ? data : []);
           setShowDropdown(true);
         }
-      }catch(err){
-        if(active){
-          const errorMsg = err?.response?.data?.message || err?.message || "Failed to fetch suggestions";
-          setRequestError(errorMsg);
+      } catch (err) {
+        if (active) {
+          setRequestError("Failed to fetch suggestions");
           setResults([]);
         }
-      }finally{
-        if(active) setLoading(false);
+      } finally {
+        if (active) setLoading(false);
       }
     };
 
     fetch();
-    return ()=>{active=false};
-  },[debouncedQuery,category]);
+    return () => {
+      active = false;
+    };
+  }, [debouncedQuery, category]);
 
   return (
-    <div>
+    <div className="relative">
+
       <input
         value={value}
-        onChange={(e)=>{
+        onChange={(e) => {
           onChange(e.target.value);
           setShowDropdown(true);
         }}
-        onFocus={() => results.length > 0 && setShowDropdown(true)}
-        placeholder={category?"Type test name":"Select category first"}
-        className="w-full border px-3 py-2 rounded"
+        placeholder={category ? "Search medical test..." : "Select category first"}
+        className="w-full border border-gray-300 rounded-xl px-4 py-2 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
       />
 
-      {loading && <p className="text-sm text-gray-500">Searching...</p>}
-      {requestError && <p className="text-red-500 text-sm">{requestError}</p>}
-      
-      {!loading && !requestError && value.length >= MIN_QUERY_LENGTH && results.length === 0 && !showDropdown && (
-        <p className="text-gray-500 text-sm mt-2">❌ No results found</p>
+      {loading && (
+        <p className="text-sm text-gray-500 mt-2">Searching tests...</p>
+      )}
+
+      {requestError && (
+        <p className="text-red-500 text-sm mt-2">{requestError}</p>
       )}
 
       {showDropdown && results.length > 0 && (
-        <div className="border mt-2 rounded bg-white max-h-96 overflow-y-auto shadow-lg z-10">
-          <div className="sticky top-0 bg-gray-100 px-3 py-2 text-xs text-gray-600 border-b">
-            📊 Showing {results.length} result{results.length !== 1 ? 's' : ''}
+        <div className="absolute z-20 w-full bg-white border border-gray-200 rounded-xl shadow-lg mt-2 max-h-80 overflow-y-auto">
+
+          <div className="sticky top-0 bg-gray-50 px-4 py-2 text-xs text-gray-500 border-b">
+            Showing {results.length} result{results.length !== 1 ? "s" : ""}
           </div>
-          {results.map(item=>(
+
+          {results.map((item) => (
             <button
               key={item.loincCode}
               type="button"
-              onClick={()=>{
+              onClick={() => {
                 onSelect(item);
                 setShowDropdown(false);
                 setResults([]);
               }}
-              className="w-full text-left px-3 py-2 hover:bg-blue-100 border-b transition"
+              className="w-full text-left px-4 py-3 hover:bg-blue-50 transition"
             >
-              <div className="font-medium text-sm">{item.displayName}</div>
-              <div className="text-xs text-gray-500">{item.loincCode}</div>
+              <div className="font-medium text-gray-800">
+                {item.displayName}
+              </div>
+
+              <div className="text-xs text-gray-500">
+                {item.loincCode}
+              </div>
             </button>
           ))}
         </div>
