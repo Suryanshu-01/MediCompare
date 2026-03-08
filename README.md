@@ -1,8 +1,7 @@
-# 🏥 MediCompare: Hospital Service Recommendation & Comparison Portal
+# 🏥 *MediCompare*: Hospital Service Recommendation & Comparison Portal
 
 **Project Name:** MediCompare  
-**Version:** 1.0.0  
-**Status:** Draft 
+**Version:** 1.0.0
 **Authors:** Suryanshu, Prakhar  
 **Project Type:** Web-based Healthcare Discovery & Comparison Platform  
 
@@ -21,7 +20,7 @@ The system uses the **MapBox API** to display nearby hospitals and allows users 
 - Doctor Consultancy costs
 - Ratings of Doctors and Services
 
-The platform aims to simplify healthcare decision-making by presenting accurate and location-based information in a single interface. :contentReference[oaicite:0]{index=0}
+The platform aims to simplify healthcare decision-making by presenting accurate and location-based information in a single interface.
 
 ---
 
@@ -35,7 +34,7 @@ Individuals searching for hospitals, doctors, medical services, tests, or check-
 - Affordability
 
 ### Relatives & Caregivers
-Family members or caregivers helping patients find suitable hospitals, compare services, and initiate appointments. :contentReference[oaicite:1]{index=1}
+Family members or caregivers helping patients find suitable hospitals, compare services, and initiate appointments.
 
 ---
 
@@ -43,7 +42,7 @@ Family members or caregivers helping patients find suitable hospitals, compare s
 
 ## 1️⃣ User Authentication & Access
 
-- Email number–based registration and login
+- Email–based registration and login
 - Secure authentication flow
 - Document Verification via Admin
 - User/Hospital dashboard after successful login
@@ -129,19 +128,21 @@ cd MediCompare
 cd frontend
 npm update
 npm run dev
-//Open a new terminal and run:
+#Open a new terminal and run:
 cd backend
 npm update
 npm run dev
 
-to use MediCompare locally.
+#to use MediCompare locally.
 ```
+⚠️ **Note:**  
+The map feature will not work when running the project locally because the Mapbox API key is not included in the repository.
 ---
 
 # 🔄 User Flow
 
 1. User opens the website.
-2. User registers or logs in using their email number.
+2. User registers or logs in using their email.
 3. User enters a search query (specialization, doctor, service, test, or hospital name).
 4. The system displays:
 
@@ -153,7 +154,7 @@ to use MediCompare locally.
 7. The system displays detailed hospital information including:
 
    - Services
-   - Doctora
+   - Doctors
    - Pricing
    - Rating
 
@@ -199,22 +200,22 @@ to use MediCompare locally.
 
 ### User Dashboard
 
-![User Dashboard](screenshots/userDashboard.png)
+![User Dashboard](frontend/screenshots/userDashboard.png)
 
 ### Hospital Dashboard
 
-![Hospital Dashboard](screenshots/hospitalDashboard.png)
+![Hospital Dashboard](frontend/screenshots/hospitalDashboard.png)
 
 ### Doctor Profile Modal
 
-![Doctor Modal](screenshots/doctorModal.png)
+![Doctor Modal](frontend/screenshots/doctorModal.png)
 
 ---
 
 # 👨‍💻 Authors
 
-**Suryanshu**  
-**Prakhar**
+**Kumar Suryanshu**  
+**Prakhar Srivastava**
 
 ---
 
