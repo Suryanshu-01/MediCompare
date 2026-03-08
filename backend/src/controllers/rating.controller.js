@@ -42,18 +42,31 @@ const rateDoctors = async (req, res) => {
 
     doctor.personalDoctorRating = newAvg;
     doctor.personalDoctorRatingCount = newCount;
+    doctor.doctorRating = newAvg; // Update doctorRating field for comparison feature
 
     await doctor.save();
 
     // Update hospital's doctorRating as average of all doctors' ratings
     const hospital = await Hospital.findById(doctor.hospitalId);
     if (hospital) {
-      const allDoctors = await Doctor.find({ hospitalId: doctor.hospitalId, isActive: true });
-      const ratedDoctors = allDoctors.filter(doc => doc.personalDoctorRatingCount > 0);
-      const totalRating = ratedDoctors.reduce((sum, doc) => sum + doc.personalDoctorRating, 0);
-      const avgRating = ratedDoctors.length > 0 ? totalRating / ratedDoctors.length : 0;
+      const allDoctors = await Doctor.find({
+        hospitalId: doctor.hospitalId,
+        isActive: true,
+      });
+      const ratedDoctors = allDoctors.filter(
+        (doc) => doc.personalDoctorRatingCount > 0,
+      );
+      const totalRating = ratedDoctors.reduce(
+        (sum, doc) => sum + doc.personalDoctorRating,
+        0,
+      );
+      const avgRating =
+        ratedDoctors.length > 0 ? totalRating / ratedDoctors.length : 0;
       hospital.doctorRating = avgRating;
-      hospital.doctorRatingCount = ratedDoctors.reduce((sum, doc) => sum + doc.personalDoctorRatingCount, 0);
+      hospital.doctorRatingCount = ratedDoctors.reduce(
+        (sum, doc) => sum + doc.personalDoctorRatingCount,
+        0,
+      );
       await hospital.save();
     }
 
@@ -110,10 +123,9 @@ const rateServices = async (req, res) => {
     const serviceContribution =
       hospital.serviceRatingCount > 0 ? hospital.serviceRating : null;
 
-    const values = [
-      doctorContribution,
-      serviceContribution,
-    ].filter((v) => typeof v === "number");
+    const values = [doctorContribution, serviceContribution].filter(
+      (v) => typeof v === "number",
+    );
 
     hospital.hospitalRating =
       values.length > 0
