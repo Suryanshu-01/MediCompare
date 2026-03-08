@@ -5,6 +5,7 @@ import mapboxgl from 'mapbox-gl';
 import UserNavbar from '../components/layout/UserNavbar'; import useDebounce from '../hooks/useDebounce';
 import { searchAll } from '../services/search.service';
 import { fetchWithFallback } from '../services/apiClient';
+import apiClient from '../services/apiClient';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const UserDashboard = () => {
@@ -26,8 +27,8 @@ const UserDashboard = () => {
     const fetchHospitals = async () => {
         try {
             setLoading(true);
-            const response = await fetchWithFallback("/hospitalslocation");
-            const data = await response.json();
+            const response = await apiClient.get("/hospitalslocation");
+            const data = response.data;
 
             if (data.success && data.data) {
                 setHospitals(data.data);
@@ -182,8 +183,8 @@ const UserDashboard = () => {
         // Fetch hospitals when map is loaded
         mapRef.current.on('load', () => {
             fetchHospitals();
-            fetchWithFallback("/hospitalslocation")
-                .then(res => res.json())
+            apiClient.get("/hospitalslocation")
+                .then(response => response.data)
                 .then(data => {
                     if (data.success && data.data) {
                         data.data.forEach(({ _id, name, lng, lat, minFees, doctorRating, serviceRating, serviceMinPrice, serviceMaxPrice }) => {
