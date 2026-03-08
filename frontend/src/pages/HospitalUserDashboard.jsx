@@ -22,14 +22,15 @@ const HospitalUserDashboard = () => {
   const [error, setError] = useState("");
   const [doctorRating, setDoctorRating] = useState(null);
   const [serviceRating, setServiceRating] = useState(null);
-  const [showDoctorRatingModal, setShowDoctorRatingModal] = useState(false);
   const [showServiceRatingModal, setShowServiceRatingModal] = useState(false);
-  const [doctorRatingInput, setDoctorRatingInput] = useState(0);
   const [serviceRatingInput, setServiceRatingInput] = useState(0);
-  const [submittingDoctorRating, setSubmittingDoctorRating] = useState(false);
   const [submittingServiceRating, setSubmittingServiceRating] = useState(false);
   const [showDoctorModal, setShowDoctorModal] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [doctorPersonalRating, setDoctorPersonalRating] = useState(null);
+  const [showDoctorRatingModal, setShowDoctorRatingModal] = useState(false);
+  const [doctorRatingInput, setDoctorRatingInput] = useState(0);
+  const [submittingDoctorRating, setSubmittingDoctorRating] = useState(false);
 
   // Fetch doctors and services on component mount
   useEffect(() => {
@@ -80,6 +81,28 @@ const HospitalUserDashboard = () => {
     }
   }, [selectedDoctorId, doctors, loadingDoctors]);
 
+  // Fetch doctor rating when doctor modal opens
+  useEffect(() => {
+    const fetchDoctorRating = async () => {
+      if (showDoctorModal && selectedDoctor) {
+        try {
+          const ratingResponse = await ratingService.getDoctorRating(selectedDoctor._id);
+          if (ratingResponse.success) {
+            setDoctorPersonalRating(ratingResponse.personalDoctorRating);
+          } else {
+            setDoctorPersonalRating(null);
+          }
+        } catch (err) {
+          console.error("Error fetching doctor rating:", err);
+          setDoctorPersonalRating(null);
+        }
+      } else {
+        setDoctorPersonalRating(null);
+      }
+    };
+    fetchDoctorRating();
+  }, [showDoctorModal, selectedDoctor]);
+
   // Scroll to section based on URL hash after data loads
   useEffect(() => {
     if (doctors.length > 0 || services.length > 0) {
@@ -98,50 +121,50 @@ const HospitalUserDashboard = () => {
       <UserNavbar />
 
 
-{/* Header Section */}
-<div className="bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 border-b border-blue-200">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 border-b border-blue-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
 
-    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-      {/* Hospital Title */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-blue-900">
-          {name || "Hospital"}
-        </h1>
+            {/* Hospital Title */}
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-blue-900">
+                {name || "Hospital"}
+              </h1>
 
-        <p className="text-blue-700 text-sm mt-1">
-          Explore doctors and available services
-        </p>
-      </div>
+              <p className="text-blue-700 text-sm mt-1">
+                Explore doctors and available services
+              </p>
+            </div>
 
-      {/* Ratings */}
-      <div className="flex gap-4">
+            {/* Ratings */}
+            <div className="flex gap-4">
 
-        <div className="bg-white/70 backdrop-blur px-4 py-2 rounded-lg border border-blue-200 shadow-sm">
-          <p className="text-xs text-gray-500">Doctor Rating</p>
-          <p className="font-semibold text-blue-700">
-            {typeof doctorRating === "number"
-              ? `${doctorRating.toFixed(1)}/10`
-              : "Not rated"}
-          </p>
+              <div className="bg-white/70 backdrop-blur px-4 py-2 rounded-lg border border-blue-200 shadow-sm">
+                <p className="text-xs text-gray-500">Doctor Rating</p>
+                <p className="font-semibold text-blue-700">
+                  {typeof doctorRating === "number"
+                    ? `${doctorRating.toFixed(1)}/10`
+                    : "Not rated"}
+                </p>
+              </div>
+
+              <div className="bg-white/70 backdrop-blur px-4 py-2 rounded-lg border border-blue-200 shadow-sm">
+                <p className="text-xs text-gray-500">Service Rating</p>
+                <p className="font-semibold text-blue-700">
+                  {typeof serviceRating === "number"
+                    ? `${serviceRating.toFixed(1)}/10`
+                    : "Not rated"}
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
-
-        <div className="bg-white/70 backdrop-blur px-4 py-2 rounded-lg border border-blue-200 shadow-sm">
-          <p className="text-xs text-gray-500">Service Rating</p>
-          <p className="font-semibold text-blue-700">
-            {typeof serviceRating === "number"
-              ? `${serviceRating.toFixed(1)}/10`
-              : "Not rated"}
-          </p>
-        </div>
-
       </div>
-
-    </div>
-
-  </div>
-</div>
       {/* Error Message */}
       {error && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 mt-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
@@ -235,18 +258,6 @@ const HospitalUserDashboard = () => {
               </p>
             </div>
           )}
-
-          <div className="mt-6 flex justify-center">
-            <button
-              onClick={() => {
-                setDoctorRatingInput(0);
-                setShowDoctorRatingModal(true);
-              }}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition"
-            >
-              Rate our Doctors
-            </button>
-          </div>
         </div>
 
         {/* Services Section */}
@@ -283,9 +294,8 @@ const HospitalUserDashboard = () => {
                     {services.map((service, index) => (
                       <tr
                         key={service._id}
-                        className={`${
-                          index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                        } hover:bg-blue-50 transition border-b`}
+                        className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                          } hover:bg-blue-50 transition border-b`}
                       >
                         <td className="px-6 py-4 text-gray-900 font-medium">
                           {service.displayName || "N/A"}
@@ -331,79 +341,6 @@ const HospitalUserDashboard = () => {
         </div>
 
         {/* Rating Modals */}
-        {showDoctorRatingModal && (
-          <div
-            onClick={() => setShowDoctorRatingModal(false)}
-            className="fixed inset-0 bg-slate-900/20 backdrop-blur-md flex items-center justify-center z-50 p-4"
-          >
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-xl shadow-xl p-4 sm:p-6 w-full max-w-sm animate-in fade-in zoom-in duration-200"
-            >
-              <h3 className="text-lg font-bold mb-4 text-gray-900">
-                Rate our Doctors
-              </h3>
-              <p className="text-sm text-gray-600 mb-3">
-                Tap a star from 1 to 10.
-              </p>
-              <div className="flex justify-center gap-1 mb-4">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setDoctorRatingInput(value)}
-                    className="text-2xl focus:outline-none"
-                  >
-                    <span
-                      className={
-                        value <= doctorRatingInput
-                          ? "text-yellow-400"
-                          : "text-gray-300"
-                      }
-                    >
-                      ★
-                    </span>
-                  </button>
-                ))}
-              </div>
-              <div className="flex flex-col-reverse sm:flex-row justify-between items-center mt-4 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowDoctorRatingModal(false)}
-                  className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  disabled={submittingDoctorRating || doctorRatingInput === 0}
-                  onClick={async () => {
-                    if (!hospitalId || doctorRatingInput === 0) return;
-                    try {
-                      setSubmittingDoctorRating(true);
-                      const res = await ratingService.rateDoctors(
-                        hospitalId,
-                        doctorRatingInput,
-                      );
-                      if (res.success) {
-                        setDoctorRating(res.doctorRating);
-                        setShowDoctorRatingModal(false);
-                      }
-                    } catch (e) {
-                      console.error("Failed to submit doctor rating", e);
-                    } finally {
-                      setSubmittingDoctorRating(false);
-                    }
-                  }}
-                  className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {submittingDoctorRating ? "Submitting..." : "Submit Rating"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
         {showServiceRatingModal && (
           <div
             onClick={() => setShowServiceRatingModal(false)}
@@ -477,6 +414,80 @@ const HospitalUserDashboard = () => {
           </div>
         )}
 
+        {showDoctorRatingModal && selectedDoctor && (
+          <div
+            onClick={() => setShowDoctorRatingModal(false)}
+            className="fixed inset-0 bg-slate-900/20 backdrop-blur-md flex items-center justify-center z-[110] p-4"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-xl shadow-xl p-4 sm:p-6 w-full max-w-sm animate-in fade-in zoom-in duration-200"
+            >
+              <h3 className="text-lg font-bold mb-4 text-gray-900">
+                Rate {selectedDoctor.name}
+              </h3>
+              <p className="text-sm text-gray-600 mb-3">
+                Tap a star from 1 to 10.
+              </p>
+              <div className="flex justify-center gap-1 mb-4">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setDoctorRatingInput(value)}
+                    className="text-2xl focus:outline-none"
+                  >
+                    <span
+                      className={
+                        value <= doctorRatingInput
+                          ? "text-yellow-400"
+                          : "text-gray-300"
+                      }
+                    >
+                      ★
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <div className="flex flex-col-reverse sm:flex-row justify-between items-center mt-4 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowDoctorRatingModal(false)}
+                  className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={submittingDoctorRating || doctorRatingInput === 0}
+                  onClick={async () => {
+                    if (!selectedDoctor || doctorRatingInput === 0) return;
+                    try {
+                      setSubmittingDoctorRating(true);
+                      const res = await ratingService.rateDoctors(
+                        selectedDoctor._id,
+                        doctorRatingInput,
+                      );
+                      if (res.success) {
+                        setDoctorPersonalRating(res.personalDoctorRating);
+                        setDoctorRating(res.hospitalDoctorRating); // Update hospital doctor rating
+                        setShowDoctorRatingModal(false);
+                      }
+                    } catch (e) {
+                      console.error("Failed to submit doctor rating", e);
+                    } finally {
+                      setSubmittingDoctorRating(false);
+                    }
+                  }}
+                  className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {submittingDoctorRating ? "Submitting..." : "Submit Rating"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {showDoctorModal && selectedDoctor && (
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
             <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-300">
@@ -526,11 +537,10 @@ const HospitalUserDashboard = () => {
                       )}
 
                       <div
-                        className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold shadow-sm ${
-                          selectedDoctor.isActive
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
+                        className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold shadow-sm ${selectedDoctor.isActive
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                          }`}
                       >
                         ●{" "}
                         {selectedDoctor.isActive ? "Available" : "Unavailable"}
@@ -566,16 +576,12 @@ const HospitalUserDashboard = () => {
                         {selectedDoctor.specialization || "General Physician"}
                       </p>
 
-                      <div className="flex items-center gap-2 mt-2 text-gray-600 text-sm">
-                        <span className="bg-gray-100 px-2 py-0.5 rounded italic">
-                          {selectedDoctor.experience
-                            ? `${selectedDoctor.experience} Years Experience`
-                            : "Exp. N/A"}
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="bg-gray-100 px-2 py-0.5 rounded italic text-sm">
+                          Rating: {typeof doctorPersonalRating === "number"
+                            ? `${doctorPersonalRating.toFixed(1)}/10`
+                            : "Not rated"}
                         </span>
-
-                        <span>•</span>
-
-                        <span>{selectedDoctor.gender}</span>
                       </div>
                     </header>
 
@@ -652,6 +658,15 @@ const HospitalUserDashboard = () => {
 
               {/* Footer */}
               <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3">
+                <button
+                  onClick={() => {
+                    setDoctorRatingInput(0);
+                    setShowDoctorRatingModal(true);
+                  }}
+                  className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700"
+                >
+                  Rate this Doctor
+                </button>
                 <button
                   onClick={() => setShowDoctorModal(false)}
                   className="ml-auto px-6 py-3 border border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-100"

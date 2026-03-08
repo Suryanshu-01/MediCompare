@@ -86,8 +86,7 @@ const UserDashboard = () => {
         hospitals.find((h) => h._id === service.hospitalId);
 
     const getDoctorRatingValue = (doctor) => {
-        const hosp = getDoctorHospital(doctor);
-        return typeof hosp?.doctorRating === 'number' ? hosp.doctorRating : 0;
+        return typeof doctor?.personalDoctorRating === 'number' ? doctor.personalDoctorRating : 0;
     };
 
     const getServiceRatingValue = (service) => {
@@ -167,7 +166,7 @@ const UserDashboard = () => {
                     const userLat = position.coords.latitude;
                     if (mapRef.current) {
                         mapRef.current.setCenter([userLng, userLat]);
-                        mapRef.current.setZoom(12);
+                        mapRef.current.setZoom(13.5);
                         // add a marker for the user's location
                         new mapboxgl.Marker({ color: 'blue' })
                             .setLngLat([userLng, userLat])

@@ -4,6 +4,7 @@ import {
   rateDoctors,
   rateServices,
   getHospitalRatings,
+  getDoctorRating,
 } from "../controllers/rating.controller.js";
 
 const router = express.Router();
@@ -11,7 +12,10 @@ const router = express.Router();
 // All rating routes require an authenticated user
 router.use(authMiddleware);
 
-// POST /api/ratings/doctor - submit rating for doctors of a hospital
+// GET /api/ratings/doctor/:doctorId - get current rating for a doctor
+router.get("/doctor/:doctorId", getDoctorRating);
+
+// POST /api/ratings/doctor - submit rating for a specific doctor
 router.post("/doctor", rateDoctors);
 
 // POST /api/ratings/service - submit rating for services of a hospital
