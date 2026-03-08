@@ -93,6 +93,67 @@ Sorting and filtering options include:
 
 ---
 
+## ⭐ Doctor Rating System
+
+MediCompare includes a **doctor-based rating system** that allows users
+to rate doctors based on their consultation experience.
+
+### Key Features
+
+-   Users can rate individual doctors
+-   Rating scale ranges from **1 to 10**
+-   Each doctor maintains an **average rating score**
+-   Ratings are stored in the **doctorRating field**
+
+### Hospital Rating Calculation
+
+Hospital ratings are automatically calculated based on doctor ratings.
+
+Hospital rating =\
+Average rating of all doctors belonging to that hospital.
+
+------------------------------------------------------------------------
+
+## ⚖️ Doctor Comparison Feature
+
+MediCompare includes a **Doctor Comparison System** that allows users to
+compare multiple doctors before choosing the best option.
+
+### Doctor Selection
+
+Users can add doctors to a comparison list by clicking the **Compare
+Doctor** button.
+
+Rules:
+
+-   Minimum **2 doctors required**
+-   Maximum **4 doctors allowed**
+-   Duplicate doctors cannot be added
+
+A **Compare option is available in the navigation bar**, allowing users
+to access the comparison page.
+
+------------------------------------------------------------------------
+
+## Smart Doctor Score
+
+Each doctor receives a **Smart Score** calculated using:
+
+-   Doctor rating
+-   Experience
+-   Qualification
+-   Availability
+-   Consultation cost
+
+Insights displayed include:
+
+-   Best Overall Doctor
+-   Highest Rated Doctor
+-   Most Affordable Doctor
+-   Most Experienced Doctor
+
+---
+
 ## Installation
 
 ## ⚙️ Installation & Setup
@@ -157,6 +218,44 @@ The map feature will not work when running the project locally because the Mapbo
    - Doctors
    - Pricing
    - Rating
+
+---
+
+### Hospital User Flow
+
+Hospital opens the website.
+
+Hospital registers or logs in using their hospital email ID.
+
+Hospital is redirected to the hospital dashboard.
+
+The system displays hospital information including:
+
+Hospital name  
+Verification status (Verified / Rejected / Pending)  
+Hospital contact information  
+
+The dashboard also shows hospital statistics:
+
+Total doctors  
+Active doctors  
+Inactive doctors  
+
+Hospital can access management options:
+
+Add new doctors  
+Add hospital services  
+Manage existing doctors  
+
+Hospital can view the doctor list and perform actions such as:
+
+Activate or deactivate doctors  
+Update doctor information  
+Remove doctors  
+
+Hospital can add and manage available medical services offered by the hospital.
+
+All updates are reflected in the hospital dashboard.
 
 ---
 
