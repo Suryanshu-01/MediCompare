@@ -1,13 +1,11 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import doctorService from "../services/doctor.service";
 import HospitalNavbar from "../components/layout/HospitalNavbar";
-
 import { Plus, Users, Activity, ShieldCheck } from "lucide-react";
 
-export default function HospitalDashboard() {
+export default function HospitalDashboard(){
   const navigate = useNavigate();
   const { hospital, user } = useAuth();
 

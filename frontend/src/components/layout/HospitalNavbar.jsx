@@ -1,4 +1,3 @@
-
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import {
@@ -9,7 +8,10 @@ import {
   LogOut,
 } from "lucide-react";
 
+import logo from "../../assets/images/logo.jpeg";
+
 export default function HospitalNavbar() {
+
   const navigate = useNavigate();
   const location = useLocation();
   const { hospital, user, logout } = useAuth();
@@ -51,37 +53,61 @@ export default function HospitalNavbar() {
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+
       <div className="max-w-7xl mx-auto px-6">
 
         <div className="flex justify-between items-center h-16">
 
-          {/* NAV LINKS */}
-          <div className="flex items-center gap-2">
+          {/* LEFT SIDE */}
+          <div className="flex items-center gap-8">
 
-            {navItems.map((item) => {
-              const active = isActive(item.path);
+            {/* BRAND LOGO */}
+            <div
+              onClick={() => navigate("/hospital/dashboard")}
+              className="cursor-pointer flex items-center gap-3"
+            >
+              <img
+                src={logo}
+                alt="MediCompare Logo"
+                className="h-10 w-10 object-cover rounded-lg"
+              />
 
-              return (
-                <button
-                  key={item.path}
-                  onClick={() => navigate(item.path)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition
+              <span className="text-2xl font-extrabold tracking-tight">
+                <span className="text-blue-600">Medi</span>
+                <span className="text-gray-900">Compare</span>
+              </span>
+            </div>
 
-                  ${
-                    active
-                      ? "bg-blue-100 text-blue-700 shadow-sm"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-blue-600"
-                  }`}
-                >
-                  {item.icon}
-                  {item.label}
-                </button>
-              );
-            })}
+            {/* NAV LINKS */}
+            <div className="flex items-center gap-2">
+
+              {navItems.map((item) => {
+
+                const active = isActive(item.path);
+
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => navigate(item.path)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition
+
+                    ${
+                      active
+                        ? "bg-blue-100 text-blue-700 shadow-sm"
+                        : "text-gray-600 hover:bg-gray-100 hover:text-blue-600"
+                    }`}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </button>
+                );
+              })}
+
+            </div>
 
           </div>
 
-          {/* PROFILE */}
+          {/* RIGHT SIDE PROFILE */}
           <div className="flex items-center gap-4">
 
             <div className="text-right hidden sm:block">
@@ -98,7 +124,7 @@ export default function HospitalNavbar() {
               {hospital?.hospitalName?.charAt(0) || "H"}
             </div>
 
-            {/* Logout Button */}
+            {/* Logout */}
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition"
@@ -108,8 +134,11 @@ export default function HospitalNavbar() {
             </button>
 
           </div>
+
         </div>
+
       </div>
+
     </nav>
   );
 }

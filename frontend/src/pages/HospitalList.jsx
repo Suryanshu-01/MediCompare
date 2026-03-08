@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserNavbar from '../components/layout/UserNavbar';
+import { fetchWithFallback } from '../services/apiClient';
 
 const HospitalList = () => {
     const [hospitals, setHospitals] = useState([]);
@@ -15,7 +16,7 @@ const HospitalList = () => {
     const fetchHospitals = async () => {
         try {
             setLoading(true);
-            const response = await fetch("http://localhost:5000/api/hospitalslocation");
+            const response = await fetchWithFallback("/hospitalslocation");
             const data = await response.json();
 
             if (data.success && data.data) {
