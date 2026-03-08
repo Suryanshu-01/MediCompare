@@ -55,13 +55,13 @@ const UserDashboard = () => {
     };
 
     const handleDoctorClick = (doctor) => {
-    navigate(`/hospital/${doctor.hospitalId}`, {
-        state: {
-            hospitalId: doctor.hospitalId,
-            selectedDoctorId: doctor._id
-        }
-    });
-};
+        navigate(`/hospital/${doctor.hospitalId}`, {
+            state: {
+                hospitalId: doctor.hospitalId,
+                selectedDoctorId: doctor._id
+            }
+        });
+    };
     const handleServiceClick = (service) => {
         const hospital = hospitals.find((h) => h._id === service.hospitalId);
         if (!hospital) {
@@ -246,54 +246,52 @@ const UserDashboard = () => {
         <div className="min-h-screen bg-gray-50">
             <UserNavbar />
 
-{/* Search bar */}
-<div className="w-full px-6 py-3 flex items-center gap-6 bg-white shadow-sm border-b">
+            {/* Search bar */}
+            <div className="w-full px-6 py-3 flex items-center gap-6 bg-white shadow-sm border-b">
 
-    {/* Search Input */}
-    <div className="relative flex-1">
-        <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search hospitals, doctors, services..."
-            className="w-full border-2 border-sky-100 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-400 transition-colors placeholder:text-gray-400"
-        />
-    </div>
+                {/* Search Input */}
+                <div className="relative flex-1">
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search hospitals, doctors, services..."
+                        className="w-full border-2 border-sky-100 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-400 transition-colors placeholder:text-gray-400"
+                    />
+                </div>
 
-    {/* Sort Section */}
-    <div className="flex items-center gap-4 bg-sky-50 p-1.5 rounded-2xl border border-sky-100">
-        <span className="text-sm font-bold text-sky-800 ml-3 whitespace-nowrap">
-            Sort by
-        </span>
+                {/* Sort Section */}
+                <div className="flex items-center gap-4 bg-sky-50 p-1.5 rounded-2xl border border-sky-100">
+                    <span className="text-sm font-bold text-sky-800 ml-3 whitespace-nowrap">
+                        Sort by
+                    </span>
 
-        <div className="flex items-center gap-2">
-            <button
-                type="button"
-                onClick={() => setSortMode((prev) => (prev === 'rating' ? null : 'rating'))}
-                className={`px-5 py-2 text-sm font-bold rounded-xl transition-all duration-200 shadow-sm ${
-                    sortMode === 'rating'
-                        ? 'bg-blue-600 text-white scale-105 shadow-blue-200'
-                        : 'bg-white text-sky-700 hover:bg-sky-100'
-                }`}
-            >
-                Rating
-            </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setSortMode((prev) => (prev === 'rating' ? null : 'rating'))}
+                            className={`px-5 py-2 text-sm font-bold rounded-xl transition-all duration-200 shadow-sm ${sortMode === 'rating'
+                                ? 'bg-blue-600 text-white scale-105 shadow-blue-200'
+                                : 'bg-white text-sky-700 hover:bg-sky-100'
+                                }`}
+                        >
+                            Rating
+                        </button>
 
-            <button
-                type="button"
-                onClick={() => setSortMode((prev) => (prev === 'fees' ? null : 'fees'))}
-                className={`px-5 py-2 text-sm font-bold rounded-xl transition-all duration-200 shadow-sm ${
-                    sortMode === 'fees'
-                        ? 'bg-blue-600 text-white scale-105 shadow-blue-200'
-                        : 'bg-white text-sky-700 hover:bg-sky-100'
-                }`}
-            >
-                Fees
-            </button>
-        </div>
-    </div>
+                        <button
+                            type="button"
+                            onClick={() => setSortMode((prev) => (prev === 'fees' ? null : 'fees'))}
+                            className={`px-5 py-2 text-sm font-bold rounded-xl transition-all duration-200 shadow-sm ${sortMode === 'fees'
+                                ? 'bg-blue-600 text-white scale-105 shadow-blue-200'
+                                : 'bg-white text-sky-700 hover:bg-sky-100'
+                                }`}
+                        >
+                            Fees
+                        </button>
+                    </div>
+                </div>
 
-</div>
+            </div>
 
 
             {/* Main Content - Two Column Layout */}
