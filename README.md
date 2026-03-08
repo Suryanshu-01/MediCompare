@@ -199,15 +199,15 @@ to use MediCompare locally.
 
 ### User Dashboard
 
-![User Dashboard](screenshots/userDashboard.png)
+![User Dashboard](frontend/screenshots/userDashboard.png)
 
 ### Hospital Dashboard
 
-![Hospital Dashboard](screenshots/hospitalDashboard.png)
+![Hospital Dashboard](frontend/screenshots/hospitalDashboard.png)
 
 ### Doctor Profile Modal
 
-![Doctor Modal](screenshots/doctorModal.png)
+![Doctor Modal](frontend/screenshots/doctorModal.png)
 
 ---
 
