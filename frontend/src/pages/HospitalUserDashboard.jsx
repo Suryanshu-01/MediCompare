@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import UserNavbar from "../components/layout/UserNavbar";
+import CompareBar from "../components/CompareBar";
 import doctorService from "../services/doctor.service";
 import servicesService from "../services/services.service";
 import ratingService from "../services/rating.service";
+import useDoctorCompare from "../hooks/useDoctorCompare";
 
 const HospitalUserDashboard = () => {
   const location = useLocation();
@@ -31,6 +33,8 @@ const HospitalUserDashboard = () => {
   const [showDoctorRatingModal, setShowDoctorRatingModal] = useState(false);
   const [doctorRatingInput, setDoctorRatingInput] = useState(0);
   const [submittingDoctorRating, setSubmittingDoctorRating] = useState(false);
+  const [compareActionMessage, setCompareActionMessage] = useState("");
+  const { addDoctor } = useDoctorCompare();
 
   // Fetch doctors and services on component mount
   useEffect(() => {
@@ -86,7 +90,9 @@ const HospitalUserDashboard = () => {
     const fetchDoctorRating = async () => {
       if (showDoctorModal && selectedDoctor) {
         try {
-          const ratingResponse = await ratingService.getDoctorRating(selectedDoctor._id);
+          const ratingResponse = await ratingService.getDoctorRating(
+            selectedDoctor._id,
+          );
           if (ratingResponse.success) {
             setDoctorPersonalRating(ratingResponse.personalDoctorRating);
           } else {
@@ -101,6 +107,12 @@ const HospitalUserDashboard = () => {
       }
     };
     fetchDoctorRating();
+  }, [showDoctorModal, selectedDoctor]);
+
+  useEffect(() => {
+    if (!showDoctorModal) {
+      setCompareActionMessage("");
+    }
   }, [showDoctorModal, selectedDoctor]);
 
   // Scroll to section based on URL hash after data loads
@@ -119,14 +131,12 @@ const HospitalUserDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <UserNavbar />
-
+      <CompareBar />
 
       {/* Header Section */}
       <div className="bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 border-b border-blue-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
             {/* Hospital Title */}
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-blue-900">
@@ -140,7 +150,6 @@ const HospitalUserDashboard = () => {
 
             {/* Ratings */}
             <div className="flex gap-4">
-
               <div className="bg-white/70 backdrop-blur px-4 py-2 rounded-lg border border-blue-200 shadow-sm">
                 <p className="text-xs text-gray-500">Doctor Rating</p>
                 <p className="font-semibold text-blue-700">
@@ -158,11 +167,8 @@ const HospitalUserDashboard = () => {
                     : "Not rated"}
                 </p>
               </div>
-
             </div>
-
           </div>
-
         </div>
       </div>
       {/* Error Message */}
@@ -294,8 +300,9 @@ const HospitalUserDashboard = () => {
                     {services.map((service, index) => (
                       <tr
                         key={service._id}
-                        className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                          } hover:bg-blue-50 transition border-b`}
+                        className={`${
+                          index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                        } hover:bg-blue-50 transition border-b`}
                       >
                         <td className="px-6 py-4 text-gray-900 font-medium">
                           {service.displayName || "N/A"}
@@ -537,10 +544,11 @@ const HospitalUserDashboard = () => {
                       )}
 
                       <div
-                        className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold shadow-sm ${selectedDoctor.isActive
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                          }`}
+                        className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold shadow-sm ${
+                          selectedDoctor.isActive
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
                       >
                         ●{" "}
                         {selectedDoctor.isActive ? "Available" : "Unavailable"}
@@ -578,7 +586,8 @@ const HospitalUserDashboard = () => {
 
                       <div className="flex items-center gap-2 mt-2">
                         <span className="bg-gray-100 px-2 py-0.5 rounded italic text-sm">
-                          Rating: {typeof doctorPersonalRating === "number"
+                          Rating:{" "}
+                          {typeof doctorPersonalRating === "number"
                             ? `${doctorPersonalRating.toFixed(1)}/10`
                             : "Not rated"}
                         </span>
@@ -668,12 +677,29 @@ const HospitalUserDashboard = () => {
                   Rate this Doctor
                 </button>
                 <button
+                  onClick={() => {
+                    const result = addDoctor({
+                      ...selectedDoctor,
+                      hospitalName: name || "Unknown Hospital",
+                    });
+                    setCompareActionMessage(result.message);
+                  }}
+                  className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700"
+                >
+                  Compare Doctor
+                </button>
+                <button
                   onClick={() => setShowDoctorModal(false)}
                   className="ml-auto px-6 py-3 border border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-100"
                 >
                   Close
                 </button>
               </div>
+              {compareActionMessage && (
+                <p className="px-6 pb-4 text-sm font-medium text-indigo-700">
+                  {compareActionMessage}
+                </p>
+              )}
             </div>
           </div>
         )}

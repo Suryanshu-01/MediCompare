@@ -45,6 +45,17 @@ export const getDoctorsByHospitalId = async (hospitalId) => {
   }
 };
 
+// Compare doctors by selected ids
+export const compareDoctors = async (doctorIds) => {
+  try {
+    const ids = Array.isArray(doctorIds) ? doctorIds.join(",") : "";
+    const response = await apiClient.get(`/doctors/compare?ids=${ids}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // Update doctor
 export const updateDoctor = async (doctorId, doctorData) => {
   try {
@@ -73,6 +84,7 @@ const doctorService = {
   getDoctors,
   getDoctorById,
   getDoctorsByHospitalId,
+  compareDoctors,
   updateDoctor,
   deleteDoctor,
 };

@@ -77,6 +77,7 @@ export const ROUTES = {
   REGISTER: "/register",
 
   USER_DASHBOARD: "/user/dashboard",
+  COMPARE_DOCTORS: "/compare-doctors",
   HOSPITAL_DASHBOARD: "/hospital/dashboard",
   ADMIN_DASHBOARD: "/admin/dashboard",
   ADMIN_REJECTED_HOSPITALS: "/admin/hospitals/rejected",

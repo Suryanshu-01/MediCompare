@@ -1,28 +1,32 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 //Browser Router:Enables routing using browser URL
-import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './routes/ProtectedRoute';
-import RoleRoute from './routes/RoleRoute';
-import { ROUTES } from './utils/constants';
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import RoleRoute from "./routes/RoleRoute";
+import { ROUTES } from "./utils/constants";
 
 // Pages
-import Login from './pages/Login';
-import Register from './pages/Register';
-import AddDoctor from './pages/AddDoctor';
-import DoctorList from './pages/DoctorList';
-import EditDoctor from './pages/EditDoctor';
-import HospitalDashboard from './pages/HospitalDashboard';
-import UserDashboard from './pages/UserDashboard';
-import HospitalUserDashboard from './pages/HospitalUserDashboard';
-import HospitalList from './pages/HospitalList';
-import ServicesList from './pages/hospital/Services/ServicesList';
-import AddService from './pages/AddService';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminRejectedHospitals from './pages/AdminRejectedHospitals';
-
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import AddDoctor from "./pages/AddDoctor";
+import DoctorList from "./pages/DoctorList";
+import EditDoctor from "./pages/EditDoctor";
+import HospitalDashboard from "./pages/HospitalDashboard";
+import UserDashboard from "./pages/UserDashboard";
+import HospitalUserDashboard from "./pages/HospitalUserDashboard";
+import HospitalList from "./pages/HospitalList";
+import CompareDoctorsPage from "./pages/CompareDoctorsPage";
+import ServicesList from "./pages/hospital/Services/ServicesList";
+import AddService from "./pages/AddService";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminRejectedHospitals from "./pages/AdminRejectedHospitals";
 
 //App Routes
-
 
 function AppRoutes() {
   return (
@@ -38,6 +42,17 @@ function AppRoutes() {
           <ProtectedRoute>
             <RoleRoute requiredRole="USER">
               <UserDashboard />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path={ROUTES.COMPARE_DOCTORS}
+        element={
+          <ProtectedRoute>
+            <RoleRoute requiredRole="USER">
+              <CompareDoctorsPage />
             </RoleRoute>
           </ProtectedRoute>
         }
@@ -169,7 +184,6 @@ function AppRoutes() {
 }
 
 // MAIN APP COMPONENT
-
 
 export default function App() {
   return (
